@@ -1,0 +1,25 @@
+bin/host -mode=sample \
+		-img=mnist_test_img_0.pgm
+MNIST Digit Classification using OpenCL
+CNN model initialization
+Allocating host memory for inputs and outputs
+Initializing OpenCL
+device count = 2
+Using Platform NVIDIA CUDA from vendor NVIDIA Corporation 
+ Opencl Version Implemented is OpenCL 1.1 CUDA 4.2.1 
+Allocating buffers on the device memory
+mnist_test_img_0.pgm
+Normalizing the data and transferring to device memory
+Transferring image to device memory
+
+OpenCL Kernel Total Runtime(ms): 16.0925
+Conv1 Execution time is: 0.729 ms
+MaxPool1 Execution time is: 0.172 ms
+Conv2 Execution time is: 11.378 ms
+MaxPool2 Execution time is: 0.408 ms
+IP1 Execution time is: 1.658 ms
+ReLU Execution time is: 0.013 ms
+IP2 Execution time is: 0.289 ms
+Softmax Execution time is: 0.013 ms
+Predicted digit = 7
+Releasing all OpenCL objects

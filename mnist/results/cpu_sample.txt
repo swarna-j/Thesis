@@ -1,0 +1,25 @@
+bin/host -mode=sample \
+		-img=mnist_test_img_0.pgm
+MNIST Digit Classification using OpenCL
+CNN model initialization
+Allocating host memory for inputs and outputs
+Initializing OpenCL
+device count = 2
+Using Platform Intel(R) OpenCL from vendor Intel(R) Corporation 
+ Opencl Version Implemented is OpenCL 1.2 LINUX 
+Allocating buffers on the device memory
+mnist_test_img_0.pgm
+Normalizing the data and transferring to device memory
+Transferring image to device memory
+
+OpenCL Kernel Total Runtime(ms): 1.30224
+Conv1 Execution time is: 0.223 ms
+MaxPool1 Execution time is: 0.044 ms
+Conv2 Execution time is: 0.725 ms
+MaxPool2 Execution time is: 0.030 ms
+IP1 Execution time is: 0.174 ms
+ReLU Execution time is: 0.009 ms
+IP2 Execution time is: 0.008 ms
+Softmax Execution time is: 0.017 ms
+Predicted digit = 7
+Releasing all OpenCL objects
