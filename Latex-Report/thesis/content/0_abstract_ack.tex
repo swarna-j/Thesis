@@ -1,0 +1,23 @@
+\chapter*{Abstract} 
+\label{ch0i_Abstract}
+
+\quad After nearly 40 years of pondering over CPU power and performance, Dr. David Patterson from Berkeley put forth the Three walls namely, the Power Wall, ILP (Instruction Level Parallelism) Wall and the Memory Wall, which marked the end of single-core computing systems\cite{mem_wall}. While ILP Wall presented the diminishing returns from aggressive pipelining in superscalars, Power Wall revealed an exponential increase in power consumption with operating frequency. Memory wall projected the gap between compute bandwidth and memory bandwidth, which could not be bridged with increasing cache sizes and optimizations. With the emergence of multiple identical cores (Multicores of the sub-micron era) on a single chip came a new set of challenges, such as scalability, parallel software availability and power limit \cite{moore2011data}.\newline
+
+Recent research efforts have unveiled the strengths of heterogeneous computing platforms which are more than just differences in Instruction Set Architectures. Heterogeneous systems have gradually evolved with time, from multiple types of processors on a single chip (GPUs, NICs, FPGAs) to previously discrete components integrated onto a single System-On-Chip. There are several aspects to be addressed to harness the full potential of GPUs and FPGAs in mainstream computing applications. Hardware accelerators provide greater efficiency in realizing a design compared to software counterparts, with improved power economics. With growing complexity of the architectures, there is a pressing need for engineers to come up with better design decisions and partition the application suitably between hardware and software, to avoid any performance bottlenecks. \newline
+
+This report deals with identification of such compute-intensive applications which can be offloaded to hardware accelerators, efficient partitioning of application between hardware and software and gauging of the various design points to achieve specific optimization goals.
+
+
+\chapter*{Acknowledgment} 
+\label{ch0ii_Acknowledgement}
+
+\quad Firstly, I would like to extend my deepest gratitude to my supervisor, Assoc Prof Dr.Douglas Leslie Maskell for giving me an opportunity to work on my area of interest. His deep insight in the field, enthusiastic support and invaluable suggestions helped me progress through my project work. \newline
+
+I am also grateful for the effective knowledge sharing sessions I’ve had with my mentor, Mr.Abhishek Kumar Jain, a PhD student under Dr.Douglas Maskell. His patient reviews, constructive feedback, constant encouragement and timely help steered me in the right direction and helped finish my thesis on time.\newline 
+
+I am greatly indebted to Mr.Gopalakrishna Hegde, a former research assistant at NTU, for his inputs and assistance during the first phase of the project. Special thanks to Mr.Prashant Ravi, a former M.Sc. student under Prof Douglas, who helped me understand the rudiments of the project field during the project exploration phase, gave warm-up exercises for me to get a hang of the work ahead and eased the tool setup.\newline 
+
+My sincere thanks to Mr.Jeremiah Chua from the Hardware and Embedded Systems Lab (HESL) for the lab facilities and technical support.\newline 
+
+Last but not the least, I would like to thank my family for their prayers and support in my pursuit of higher education. 
+

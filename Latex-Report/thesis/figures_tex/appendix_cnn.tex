@@ -1,0 +1,251 @@
+\definecolor{highlight_red}{rgb}{1.0,0.92,0.8}
+\definecolor{highlight_yellow}{rgb}{1.0,1.0,0.75}
+\definecolor{highlight_green}{rgb}{0.75,1.0,0.75}
+\newcommand{\Hilight}{\makebox[0pt][l]{\color{highlight_yellow}\rule[-4pt]{0.78\linewidth}{14pt}}}
+\newcommand{\hl}{\makebox[0pt][l]{\color{highlight_red}\rule[-4pt]{0.18\linewidth}{12pt}}}
+\newcommand{\hlg}{\makebox[0pt][l]{\color{highlight_green}\rule[-4pt]{0.3\linewidth}{12pt}}}
+
+\lstset { %
+	language=C,
+	backgroundcolor=\color{white},
+	basicstyle=\ttfamily\tiny,
+	keywordstyle=\color{magenta}\ttfamily,
+	stringstyle=\color{blue}\ttfamily,
+	commentstyle=\color{green}\ttfamily,
+    breakatwhitespace=false,
+	breaklines=true,
+    showstringspaces=false
+}
+\lstset{framesep=-5pt, xleftmargin=-5pt}
+\begin{table}[!h]
+\centering
+\caption{Removal of Altera device-specific Macros}
+\label{cnncode1:altera-dep-removal}
+\begin{tabular}{l}
+\toprule
+\begin{lstlisting}[columns=fullflexible, language=C++, escapechar=\$]
+void createDeviceBuffer() {
+	cl_int status;
+	cout << "Allocating buffers on the device memory" << endl;
+	// data is allocated in BANK1 and weights are in BANK2 for efficient access.
+	d_input_img = clCreateBuffer(context, CL_MEM_READ_ONLY |$\hl$ CL_MEM_BANK_1_ALTERA, 
+		conv1.bot_shape->x * conv1.bot_shape->y  * conv1.bot_shape->z * sizeof(DTYPE), NULL, &status);
+        conv1.d_input = clCreateBuffer(context, CL_MEM_WRITE_ONLY | $\hl$ CL_MEM_BANK_1_ALTERA,
+		(conv1.bot_shape->x+2*conv1.pad) * (conv1.bot_shape->y+2*conv1.pad) * conv1.bot_shape->z * sizeof(DTYPE), NULL, &status);
+        conv1.d_output = clCreateBuffer(context, CL_MEM_WRITE_ONLY | $\hl$ CL_MEM_BANK_1_ALTERA, 
+		conv1.top_shape.x * conv1.top_shape.y  * conv1.top_shape.z * sizeof(DTYPE), NULL, &status);
+	
+	conv1.d_W = clCreateBuffer(context, CL_MEM_READ_ONLY | $\hl$ CL_MEM_BANK_2_ALTERA | CL_MEM_COPY_HOST_PTR, 
+		conv1.K * conv1.K * conv1.bot_shape->z * conv1.top_shape.z * sizeof(WTYPE), conv1.W, &status);
+	conv1.d_b = clCreateBuffer(context, CL_MEM_READ_ONLY | $\hl$ CL_MEM_BANK_2_ALTERA | CL_MEM_COPY_HOST_PTR, 
+		conv1.top_shape.z * sizeof(WTYPE), conv1.b, &status);
+        ........
+}
+\end{lstlisting}
+\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!h]
+\centering
+\caption{Loading kernel from Source}
+\label{cnncode2:load-kernel-source}
+\begin{tabular}{l}
+\toprule
+\begin{lstlisting}[columns=fullflexible, language=C++]
+long LoadOpenCLKernel(char const* path, char **buf)
+{
+    FILE  *fp;
+    size_t fsz;
+    long   off_end;
+    int    rc;
+    /* Open the file */
+    fp = fopen(path, "r");
+    if( NULL == fp ) {
+        return -1L;
+    }
+    /* Seek to the end of the file */
+    rc = fseek(fp, 0L, SEEK_END);
+    if( 0 != rc ) {
+        return -1L;
+    }
+    /* Byte offset to the end of the file (size) */
+    if( 0 > (off_end = ftell(fp)) ) {
+        return -1L;
+    }
+    fsz = (size_t)off_end;
+    /* Allocate a buffer to hold the whole file */
+    *buf = (char *) malloc( fsz+1);
+    if( NULL == *buf ) {
+        return -1L;
+    }
+    /* Rewind file pointer to start of file */
+    rewind(fp);
+    /* Slurp file into buffer */
+    if( fsz != fread(*buf, 1, fsz, fp) ) {
+        free(*buf);
+        return -1L;
+    }
+    /* Close the file */
+    if( EOF == fclose(fp) ) {
+        free(*buf);
+        return -1L;
+    }
+    /* Make sure the buffer is NUL-terminated, just in case */
+    (*buf)[fsz] = '\0';
+    /* Return the file size */
+    return (long)fsz;
+}
+\end{lstlisting}
+\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!h]
+\centering
+\caption{Initialization of OpenCL Objects for Altera FPGA (Taken from Altera Design Examples)}
+\label{cnncode3:altera-opencl-init}
+\begin{tabular}{l}
+\toprule
+\begin{lstlisting}[columns=fullflexible, language=C++, escapechar=\$]
+bool init_opencl() {
+	cl_int status;	
+	printf("Initializing OpenCL\n");
+	if(!setCwdToExeDir()) {
+	  return false;
+	}	
+	// Get the OpenCL platform.
+	$\Hilight$ platform = findPlatform("Altera");
+	 if(platform == NULL) {
+	  printf("ERROR: Unable to find Altera OpenCL platform.\n");
+	 return false;
+	}	
+	// Query the available OpenCL device.
+	$\Hilight$ devices.reset(getDevices(platform, CL_DEVICE_TYPE_ALL, &num_devices));
+	printf("Platform: %s\n", getPlatformName(platform).c_str());
+	printf("Found %d devices in the board. Using only one device for this app\n", num_devices);
+	for(unsigned i = 0; i < num_devices; ++i) {
+	  printf("  %s\n", getDeviceName(devices[i]).c_str());
+	}
+	$\Hilight$ target_device = devices[0];	
+	// Create the context.
+	context = clCreateContext(NULL, num_devices, &target_device, &oclContextCallback, NULL, &status);
+	checkError(status, "Failed to create context");
+	
+	std::string binary_file = getBoardBinaryFile("cnn_kernels", target_device);
+	printf("Using AOCX: %s\n", binary_file.c_str());
+	$\Hilight$ program = createProgramFromBinary(context, binary_file.c_str(), &target_device, num_devices);
+	
+	// Build the program that was just created.
+	status = clBuildProgram(program, 0, NULL, "", NULL, NULL);
+	checkError(status, "Failed to build program");
+	
+	kernel.reset(num_kernels);
+	
+	// Command queue.
+	queue = clCreateCommandQueue(context, target_device, CL_QUEUE_PROFILING_ENABLE, &status);
+	checkError(status, "Failed to create command queue");
+	
+	// Kernel.
+	kernel[0] = clCreateKernel(program, "filter3D", &status);
+	checkError(status, "Failed to create kernel");
+	kernel[1] = clCreateKernel(program, "maxpool3D", &status);
+	checkError(status, "Failed to create kernel");
+	kernel[2] = clCreateKernel(program, "iplayer", &status);
+	checkError(status, "Failed to create kernel");
+	kernel[3] = clCreateKernel(program, "relu_layer", &status);
+	checkError(status, "Failed to create kernel");
+	kernel[4] = clCreateKernel(program, "softmax", &status);
+	checkError(status, "Failed to create kernel");
+
+	return true;
+}
+\end{lstlisting}
+\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!h]
+\centering
+\caption{Initialization of OpenCL Objects for a GPU Device}
+\label{cnncode4:gpu-opencl-init}
+\begin{tabular}{l}
+\toprule
+\begin{lstlisting}[columns=fullflexible, language=C++,escapechar=\$]
+bool init_opencl() {
+	cl_int status;
+	int err;
+	cl_platform_id platform_ids[5];		
+	char *KernelSource;
+	long lFileSize;
+	cl_uint dev_cnt = 0;
+
+        printf("Initializing OpenCL\n");
+	clGetPlatformIDs(0, 0, &dev_cnt);
+	$\Hilight$ clGetPlatformIDs(dev_cnt, platform_ids, NULL);
+        int gpu = 1;
+	for(unsigned i = 0;i < dev_cnt; i++)
+	{
+	   err = clGetDeviceIDs(platform_ids[i], $\hlg$ gpu ? CL_DEVICE_TYPE_GPU:CL_DEVICE_TYPE_CPU, 1, &target_device, NULL);
+           if(err == CL_SUCCESS)
+           {
+		break;
+	   }
+        }
+	if (err != CL_SUCCESS)
+	{
+	   printf("Error: Failed to create a device group!\n");
+	   return EXIT_FAILURE;
+   	}
+
+	// Create the context.
+        context = clCreateContext(0, 1, &target_device, NULL, NULL, &err);
+	if (!context)
+	{
+	    printf("Error: Failed to create a compute context!\n");
+	    return EXIT_FAILURE;
+	}
+
+	$\Hilight$ lFileSize = LoadOpenCLKernel("device/cnn_kernels.cl", &KernelSource);
+	if( lFileSize < 0L ) {
+		perror("File read failed");
+		return 1;
+	}
+
+	$\Hilight$ program = clCreateProgramWithSource(context, 1, (const char **) & KernelSource, NULL, &err);
+	if (!program)
+	{
+		printf("Error: Failed to create compute program!\n");
+		return EXIT_FAILURE;
+	}
+
+	// Build the program that was just created.
+	$\Hilight$ status = clBuildProgram(program, 0, NULL, "", NULL, NULL);
+	checkError(status, "Failed to build program");
+	
+	kernel.reset(num_kernels);
+	// Command queue.
+	$\Hilight$ queue = clCreateCommandQueue(context, target_device, CL_QUEUE_PROFILING_ENABLE, &status); 
+	checkError(status, "Failed to create command queue");
+	
+	// Kernel.
+	kernel[0] = clCreateKernel(program, "filter3D", &status);
+	checkError(status, "Failed to create kernel");
+	kernel[1] = clCreateKernel(program, "maxpool3D", &status);
+	checkError(status, "Failed to create kernel");
+	kernel[2] = clCreateKernel(program, "iplayer", &status);
+	checkError(status, "Failed to create kernel");
+	kernel[3] = clCreateKernel(program, "relu_layer", &status);
+	checkError(status, "Failed to create kernel");
+	kernel[4] = clCreateKernel(program, "softmax", &status);
+	checkError(status, "Failed to create kernel");
+	return true;
+}
+\end{lstlisting}
+\\
+\bottomrule
+\end{tabular}
+\end{table}

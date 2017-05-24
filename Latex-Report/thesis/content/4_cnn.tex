@@ -1,0 +1,672 @@
+\chapter{Hardware Acceleration using Graphics Processing Unit}
+\label{ch4_cnn}
+It is no secret that many technical giants such as NVIDIA, IBM, Google and Fujitsu have recently invested a lot to train engineers and carry out research in the field of Artificial Intelligence, to harness automated solutions that will bridge the current gap between technology integration and expertise. Deep Learning is an avant-garde approach to imparting knowledge to the machines to achieve the ultimate goal of artificial intelligence, without explicit coding. It is of interest in several domains\cite{wiki_ml}, such as:
+\begin{itemize}
+\item Self-driving cars, Automated flight control, Handwriting and Voice recognition software, which are real-time and cannot be programmed by hand or require intense effort doing so manually.
+\item Database Mining.
+\item Applications with Product Recommendations in e-commerce websites such as Amazon and Netflix, which are essentially self-customizing.
+\item Understanding of the human genome.
+\item Anti-Spam filters and Intelligent Search bars in browsers.
+\end{itemize} 
+Claims have been made that off-the-shelf accelerators in the embedded platforms offer an edge over CPU-based systems in deep learning computations\cite{hegde2016caffepresso}. We seek to validate the efficiency of deep-learning methods on heterogeneous architectures with a simple Lenet-5 Model of MNIST Dataset classifier. 
+\section{Deep Learning using Convolutional Neural Networks}
+\label{4_1}
+The Figure \ref{fig:ML_Classification} shows the most common types of learning algorithms. The choice of the algorithm depends on the problem we intend to solve.
+\begin{figure}[h!]
+  \includegraphics[width=\linewidth]{figures/ML_Classification.PNG}
+  \caption{Types of Machine Learning Algorithms
+  \cite{upx_ml}}
+  \label{fig:ML_Classification}
+\end{figure}
+\newline Various experiments have substantiated the claim that Convolutional Neural Networks (also called ConvNets or CNNs) outperform other gradient-based learning techniques in handling variable input dimensions in the 2-dimensional space \cite{lecun1998gradient}.
+Multilayer ConvNets with back-propagation can be exploited to build a strong decision layer capable of classifying data of high dimensionality, with minimal processing. \newline \newline
+Any character recognition system is comprised of the following two parts:\newline
+1.	\textbf{Feature Extractor }– \newline
+It transforms the input into low-dimensional feature vectors which comprise of only the relevant information of interest from the huge input data \cite{wiki_fe}. The chosen features are essentially invariant to the transformations and distortions that are applied to the input. 
+\newline
+Feature extraction attempts to reduce the complexity that stems from high input dimensionality, by downsizing the data while still accomplishing reasonable accuracy in the description of data \cite{wiki_fe}. Feature extractors are application-specific.\newline \newline
+2.	\textbf{Classifier} – \newline
+It is a trainable general-purpose entity which analyzes the data and categorizes the feature vectors appropriately into classes. The accuracy of a classifier is predominantly decided by the features selected in the feature extraction process. \newline
+The efficiency of a classifier is determined not just by the correctness in categorizing a given set of test input samples but also the error rate. 
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\linewidth]{figures/classifier_efficiency_formula.PNG}
+  \caption{Formula to determine Classifier Efficiency
+  \cite{lecun1998gradient}}
+  \label{fig:classifier_efficiency_formula}
+\end{figure}
+\newline Studies have revealed the relationship between expected error rate on test set and error rate on training set as shown in Figure \ref{fig:classifier_efficiency_formula}. The difference between these two error values decreases as the number of training samples increases. Also, if the complexity of the system “h” increases, training error decreases. Hence, we can infer that the system becomes more robust with more training. 
+\newline \newline
+The traditional machine learning approach involves handcrafting features of interest, which can take painstaking amount of time and effort, coupled with domain expertise. Feature engineering in Deep nets is automatic and more accurate in comparison to conventional methods \cite{dlintro_am}.
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\linewidth]{figures/dlvsml.png}
+  \caption{Learning differences - Traditional vs. Deep Learning
+  \cite{dlintro_am}}
+  \label{fig:deep_learning_flow}
+\end{figure}
+\newline
+Owing to high computational complexity, CNN usage is restricted, especially in portable devices \cite{gysel2016hardware}. 
+
+\subsection{MNIST Digit Recognition using Lenet-5 ConvNet}
+\label{4_1_1}
+The Lenet-5 Architecture for handwritten digit recognition was first conceived by LeCun et al. in 1998. The MNIST(Modified National Institute of Standards and Technology) database consisting of 60000 training samples and 10000 test inputs available for download in \cite{mnist_database} was used for the experiments discussed in the paper \cite{lecun1998gradient}. This paper proved the general consensus \ref{fig:deep_learning_flow}  that ConvNets eliminate the need for hand-made feature extractors and are the most efficient. Today, Artificial Intelligence is a buzzword and almost all AI related applications are leveraging ConvNets to achieve the best performance with low runtime complexities. 
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth]{figures/Lenet-5-org.PNG}
+  \caption{Original Lenet-5 ConvNet Architecture; Each plane represents a feature map in which weights are shared.
+  \cite{lecun1998gradient}}
+  \label{fig:Lenet-5-org}
+\end{figure}
+Figure \ref{fig:Lenet-5-org} shows the original Lenet-5 architecture described in \cite{lecun1998gradient}. 
+It is important to understand the purpose of various layers of the Lenet-5 ConvNet architecture to study their runtime in the application. The following subsections shall describe the layers in detail.
+\subsubsection{Convolution Layer \cite{cnn_ak}}  
+\begin{figure}[h!]
+  \includegraphics[width=\linewidth]{figures/ConvLayer.PNG}
+  \caption{Convolution Layer
+  \cite{cnn_ytak}}
+  \label{fig:ConvLayer}
+\end{figure}
+Convolution Layer is the core of a ConvNet. Consider an input volume of height $H_i$, width $W_i$ and depth $D_i$. The depth indicates the color channels, i.e. the third dimension of input volume which can be activated. A filter of dimension F × F is slid over the input image spatially to evaluate dot products between the input image volume and the filter, thus generating 2-dimensional activation maps. The filter spans through the depth of the input image. 
+\newline \newline Activation map is a visualization of which portions of the input volume are responding to the filter. For example, if the filter is intended to filter out vertical lines, activation map is representative of filter activations on the image. i.e. it contains all portions of the image which are likely to have vertical lines.  Usually, several filters, also called kernels are convolved with the input image, resulting in several activation maps stacked in the depth dimension. In a ConvNet, there are several convolution layers and intuitively, they build up an entire feature hierarchy. 
+\newline
+Each stage builds up very specific features which filters in the subsequent stages will be excited about. i.e. piece by piece, we create 3-D volumes of higher levels of abstraction than the previous stage\cite{zeiler2014visualizing}.\newline \newline
+\begin{figure}[h!]
+  \includegraphics[width=\linewidth]{figures/zero_padding_conv.PNG}
+  \caption{Preserving Input dimensions using Zero Padding
+  \cite{cnn_ytak}}
+  \label{fig:zero_padding_conv}
+\end{figure}\underline{\textbf{\emph{\large Generalization of Concepts:}}}\newline
+\textbf{Required Hyperparameters:}
+	\begin{adjustwidth}{2cm}{}
+       Number of filters, K \newline
+       Spatial Extent of the filter, F \newline
+       Stride, S \newline
+       Quantum of Zero padding, P (Figure \ref{fig:zero_padding_conv})
+	\end{adjustwidth}
+\textbf{Input Dimensions:} $W_1$×$H_1$×$D_1$ \newline
+\textbf{Output Dimensions:} $W_2$×$H_2$×$D_2$, 
+	\begin{adjustwidth}{2cm}{}
+      Where \newline 
+	  $D_2$ = K \newline
+	  $W_2$ = (($W_1$ – F +2P)/S) + 1 \newline
+	  $H_2$ = (($H_1$ – F +2P)/S) + 1 \newline
+    \end{adjustwidth}
+Each filter has an associated bias. The value 1 is added in the above formulae to account for that bias. Stride is the distance by which the filter is slid around the input volume.\newline
+Hence, total number of parameters introduced in the neural network is given by (F . F. $D_1$) × K weights and K biases. For computational convenience, K is usually set as powers of 2. Some libraries branch into special routines when encountering powers of 2, and these routines are highly optimized and efficient for computations in a vectorized form \cite{cnn_ytak}. \newline \newline
+The output of a filter covering a particular region of the input x can be interpreted to be a neuron fixed in space, which computes $w^T$x + b. The connections of the neuron are localized and this connectivity expands up to the receptive field of the neuron, given by the filter size F × F. An activation map can be perceived as a grid of neurons with shared weights and representing the dot products of each F × F patch of the input volume. As there can be multiple filters in a single convolution layer, the resultant output is a 3-D volume of neurons, as illustrated in Figure \ref{fig:ConvLayer_1}. This 3-D volume has shared parameters spatially (H×W – within the same depth slice) but across depth, the parameters are different. The neurons illustrated in the Figure \ref{fig:ConvLayer_1} are all acting on the same input patch but with different weights. 
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\linewidth]{figures/ConvLayer_1.PNG}
+  \caption{3-dimensional volume of Neurons
+  \cite{cnn_ytak}}
+  \label{fig:ConvLayer_1}
+\end{figure}
+\subsubsection{MaxPool Layer:}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.7\linewidth]{figures/maxpool.PNG}
+  \caption{Max Pooling
+  \cite{cnn_ak}}
+  \label{fig:maxpool}
+\end{figure}
+Down-sampling layer which operates independently on all activation maps.
+\textbf{Required Hyperparameters:}
+  \begin{adjustwidth}{2cm}{}
+  Spatial Extent of the filter, F \newline
+  Stride, S 
+  \end{adjustwidth}
+\textbf{Input Dimensions:} $W_1$×$H_1$×$D_1$ \newline
+\textbf{Output Dimensions:} $W_2$×$H_2$×$D_2$ 
+  \begin{adjustwidth}{2cm}{}
+  Where \newline
+  $W_2$ = (($W_1$-F)/S)+1 \newline
+  $H_2$ = (($H_1$-F)/S)+1 \newline
+  $D_2$ = $D_1$
+  \end{adjustwidth}
+Example of Maxpool operation with filter size 2 × 2 and Stride 2 is illustrated in Figure \ref{fig:maxpool}.
+\subsubsection{Inner Product Layer}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.5\linewidth]{figures/FCLayer.png}
+  \caption{Inner Product Layer
+  \cite{cnn_ak}}
+  \label{fig:FCLayer}
+\end{figure}
+It is also called the fully connected layer as the neurons of this layer are pairwise fully connected with the neurons of the previous (input) layer. The neurons within the same layer do not share connections.
+\subsubsection{ReLU Layer}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.5\linewidth]{figures/relu.PNG}
+  \caption{ReLU Function in Neural Networks
+  \cite{wiki_relu}}
+  \label{fig:relu}
+\end{figure}
+Rectified Linear Unit \cite{nair2010rectified} is a non-linear activation function described by Figure \ref{fig:relu}, commonly used in neural networks for the purpose of thresholding after convolution. ReLU is faster compared to other activation functions such as sigmoid and tanh units as it does not involve any normalization or exponential calculation, unlike its counterparts. 
+\subsubsection{Softmax Layer}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.3\linewidth]{figures/softmax.PNG}
+  \caption{Softmax Function
+  \cite{mathworks_softmax}}
+  \label{fig:softmax}
+\end{figure}
+MNIST Digit Classifier has ten class labels for the ten digits 0 to 9, which are mutually exclusive. An ideal classifier should assign a probability of 1 to one of the ten possible nodes at the output and assign 0 probability to others. Due to difficulty in realizing this, we use Softmax function usually in the last layer of the ConvNet, which increases the probability of the maximum value from the previous stage in such a way that sum of the output probabilities of the 10 classes is 1 \cite{softmax_cmc}.
+\subsubsection{Modified Hyperparameters for MNIST Dataset}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth]{figures/Lenet-5-papaa.PNG}
+  \caption{Lenet-5 CNN Architecture for MNIST Dataset with modified hyperparameters
+  \cite{papaa-opencl}}
+  \label{fig:Lenet-5-MNIST}
+\end{figure}
+Different versions of MNIST Datasets have been introduced over the years. The first version had images centred within the 28×28 region and it was extended to 32×32 images by adding extra background pixels \cite{lecun1998gradient}. In the later versions of the database, images were normalized in size to fit a 20×20 field, forming the centre of mass of the resultant 28×28 image. The Architecture illustrated in the Figure \ref{fig:Lenet-5-org} uses 32×32 images while the benchmark code \cite{papaa-opencl} that will be used for our experiments uses 28x28 images. Table \ref{table:hyperparams} defines the hyper-parameters for the different layers of the MNIST/Lenet-5 CNN benchmark application\cite{papaa-opencl}.
+\begin{table}
+\begin{tabular}
+{|m{6em}|m{6em}|c|c|}
+\hline
+\centering \textbf{Layers} & \textbf{\makecell{Input\\Dimensions}} & \textbf{\makecell{Hyper-\\parameters}} & \textbf{Output Dimensions}\\
+\hline
+\centering Convolution Layer 1 & \makecell[l]{$W_1$×$H_1$×$D_1$=\\28×28×1} & \makecell[l]{F = 5,\quad S = 1,\\K = 20,\quad P = 0} & \makecell[l]{$W_2$ = ((28-5)/1)+1 = 24\\$H_2$ = ((28-5)/1)+1 = 24\\$W_2$ = 20}\\
+\hline
+\centering MaxPool Layer 1 &\makecell[l]{$W_1$×$H_1$×$D_1$=\\24×24×20}&\makecell[l]{F = 2,\quad S = 2}&\makecell[l]{$W_2$ = ((24-2)/2)+1 = 12\\$H_2$ = ((24-2)/2)+1 = 12\\$W_2$ = 20}\\
+\hline
+\centering Convolution Layer 2 & \makecell[l]{$W_1$×$H_1$×$D_1$=\\12×12×20} & \makecell[l]{F = 5,\quad S = 1,\\K = 50,\quad P = 0} & \makecell[l]{$W_2$ = ((12-5)/1)+1 = 8\\$H_2$ = ((12-5)/1)+1 = 8\\$W_2$ = 50}\\
+\hline
+\centering MaxPool Layer 2 &\makecell[l]{$W_1$×$H_1$×$D_1$=\\8×8×50}&\makecell[l]{F = 2,\quad S = 2}&\makecell[l]{$W_2$ = ((8-2)/2)+1 = 4\\$H_2$ = ((8-2)/2)+1 = 4\\$W_2$ = 50}\\
+\hline
+\centering Inner Product Layer 1 &\makecell[l]{(4×4×50=800)\\ \\$W_1$×$H_1$×$D_1$=\\1×1×800 \\(Vector of\\matrices)}&\makecell[l]{Number of Outputs\\= 500 (defined in\\ lenet5Model.h)} &\makecell[c]{500\\ (Vector of float values)}\\
+\hline
+\centering ReLU\\Layer &\centering 500& - &500\\
+\hline
+\centering Inner Product Layer 2 &\centering 500& \makecell[l]{Number of Outputs\\= 10 (defined in\\ lenet5Model.h)} &10\\
+\hline
+\centering Softmax Layer &\centering 10& - &10\\
+\hline
+\end{tabular}
+\caption{Hyperparameters for Lenet-5 CNN described in MNIST/Lenet-5 ConvNet Benchmark code\cite{papaa-opencl}}
+\label{table:hyperparams}
+\end{table}
+\subsection{Experiments with C++ Code}
+\label{4_1_2}
+
+\subsubsection{Prerequisites}
+\label{4_1_2_1}
+Performance Application Programming Interface (also called PAPI) offers interfaces to hardware performance counters in the underlying platform. These counters count the number of occurrences of a specific event or signal related to the functioning of the processor. This library is used to benchmark the test application and can be installed as follows:
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ sudo apt-get install papi-tools
+\end{lstlisting}
+\end{scriptsize}
+Download PAPI files from the official PAPI Website \cite{papi_official}.
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ wget http://icl.cs.utk.edu/projects/papi/downloads/papi-5.5.0.tar.gz
+\end{lstlisting}
+\end{scriptsize}
+Extract the tar file and open the directory:
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ tar -zxvf papi-5.5.0.tar.gz
+$ cd papi-5.5.0
+\end{lstlisting}
+\end{scriptsize}
+Follow the steps specified in the file INSTALL.txt inside the PAPI directory.\newline
+As the Makefile is not already available, we create the Makefile using the command:
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ sudo ./configure
+\end{lstlisting}
+\end{scriptsize}
+After the creation of Makefile, compile and link the library using the command (spawn as many parallel threads as is supported by the number of CPUs in the system):
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ sudo make -j24
+\end{lstlisting}
+\end{scriptsize}
+To check for errors, perform a simple test:
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ sudo make test -j24
+\end{lstlisting}
+\end{scriptsize}
+To run all the available test programs:
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ sudo make fulltest -j24
+\end{lstlisting}
+\end{scriptsize}
+Navigate to the directory when the benchmark code using PAPI is located and link the code to PAPI library by setting the following environment variable:
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ export LD_LIBRARY_PATH=/usr/local/lib
+\end{lstlisting}
+\end{scriptsize}
+\subsubsection{Existing Code Flow Description}
+\label{4_1_2_2}
+Figure \ref{fig:CPP_flow_lenet5} shows the code flow in software. The model is pre-trained using Caffe framework and the weights and biases are stored in the file lenet5\_model.cpp for use in the main application.\newline
+There are two Application modes, namely \textit{Sample} and \textit{Test}. The \textit{Sample} mode is used when a MNIST single image has to be identified. The \textit{Test} mode is to test the full MNIST dataset, compare the predicted digit against the pre-defined image label and calculate the prediction accuracy.\newline\newline
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\linewidth]{figures/CPP_flow_lenet5.png}
+\caption{Software Code Flow
+\cite{papaa-opencl}}
+\label{fig:CPP_flow_lenet5}
+\end{figure}\textbf{Compilation Steps \cite{papaa-opencl}} \newline\newline
+\underline{To compile the code:}
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ make all
+\end{lstlisting}
+\end{scriptsize}
+\underline{To test a sample image:}
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ ./lenet_app -m sample -i <image_path>
+\end{lstlisting}
+\end{scriptsize}
+Example: 
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ ./lenet_app -m sample -i ../imgs/mnist_test_img_0.pgm
+\end{lstlisting}
+\end{scriptsize}
+\underline{To test the full MNIST Dataset:}
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ ./lenet_app -m test -f <image_list_file> -d <image_dir> [-n <no_images_to_test>]
+\end{lstlisting}
+\end{scriptsize}
+Example: 
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ ./lenet_app -m test -f ../imgs/mnist_test_img_list.csv -d ../imgs/mnist-testset
+\end{lstlisting}
+\end{scriptsize}
+The .csv image list file contains all MNIST handwritten images sized 28x28, along with their labels. These labels help calculate the prediction accuracy and error probability of the digit classifier.\newline
+\textbf{Acceleration Hot-spots} \newline 
+In order to identify the acceleration hot-spots, each operation of the ConvNet was profiled and the results were observed as illustrated in Table \ref{table:sw_hotspots}. The API \textit{\textbf{PAPI\_get\_virt\_usec()}} is used to get the timestamp in microseconds. To use this API, header file "papi.h" has to be included in the source file.
+\begin{table}[htbp]
+\caption{Analysis of Application Hot-spots for Acceleration}
+\centering
+\begin{tabular}{l c}
+\toprule
+Layers & Computation Time (usec)\\
+\midrule
+Convolution 1 &12308\\
+\midrule
+MaxPool 1 &3382\\
+\midrule
+Convolution 2 &48164\\
+\midrule
+MaxPool 2 &559\\
+\midrule
+Inner Product 1 &5522\\
+\midrule
+ReLU&12\\
+\midrule
+Inner Product 2 &73\\
+\midrule
+Softmax&9\\
+\bottomrule
+\end{tabular}
+\label{table:sw_hotspots}
+\end{table}
+The convolution layer involves about 86\% ((12308+48164)/70029) of the required arithmetic operations in the ConvNets framework. Following this, the fully connected layers are the next most resource-intensive layers. 
+\subsubsection{Improvements}
+\label{4_1_2_3}
+One approach to minimizing data transfer to off-chip memory is by using reduced bit-width fixed point numbers, realizable by using open-source fixed point arithmetic libraries like LibFi \cite{LibFi}. This approach is very straightforward and promises speedup, reduced area and consequently reduced energy consumption. However, the specifics of this approach are beyond the scope of this thesis. \newline \newline
+We intend to port the various layers of the ConvNet into Graphics Processing Unit for concurrent execution and significant speedup. This requires some understanding of the OpenCL device models discussed in Section \ref{2_3_1}
+Each platform comes with a ready-to-use library which may pose optimization challenges, especially when designing larger applications.  Yet another challenge is mapping, owing to differences in on-chip memory, kinds of parallelism that a particular accelerator can support and communication bandwidth. We seek to accelerate the layers of the ConvNet by using fine-grained GPUs which exhibit a high degree of data-parallelism.
+\subsection{Experiments with OpenCL Code}
+\label{4_1_3}
+\subsubsection{Pre-requisites}
+\label{4_1_3_1}
+\subsubsection*{OpenCL Setup in Ubuntu 14.04}
+The following are required to run OpenCL Applications on the system: 
+\begin{itemize}
+\item Drivers to support OpenCL - Already available in current GPUs
+\item OpenCL Headers
+\item Vendor-specific libraries (specific to Intel, NVIDIA, AMD, etc.)
+\item Installable client driver (.icd)
+\item libOpenCL.so 
+\end{itemize} \textbf{1. Installing OpenCL Headers \cite{opencl_headers}:} \newline
+Navigate to the path \textit{/usr/include} and create a directory named CL.
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ sudo apt-get install opencl-headers
+\end{lstlisting}
+\end{scriptsize}
+\textbf{2. Installing vendor-specific libraries} \newline
+As Intel CPU is used for our experiments, the following packages are to be installed:
+\begin{itemize}
+\item OpenCL™ Runtime 16.1 for Intel Core™ and Intel Xeon Processors for Ubuntu (64-bit) \cite{intel_runtime}
+\item Intel SDK for OpenCL™ Applications \cite{intel_openclSDK}
+\end{itemize}
+After navigating to the respective installation directories, the command: 
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ sudo ./install.sh
+\end{lstlisting}
+\end{scriptsize}
+is used to initiate installation. \newline\newline
+\textbf{Dependencies:}\newline \newline
+\textbf{mono-devel} package (Installation steps summarized in \cite{mono-devel}).\newline Other missing packages are usually prompted during installation and can be installed using the command: 
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ sudo apt-get install <package_name>
+\end{lstlisting}
+\end{scriptsize}
+Extract the SDK tarball and navigate to the extracted directory:
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting} 
+$ tar -xzvf intel_sdk_for_opencl_2016_ubuntu_6.3.0.1904_x64.tgz
+$ cd intel_sdk_for_opencl_2016_ubuntu_6.3.0.1904_x64
+\end{lstlisting}
+\end{scriptsize}
+The rpm directory contains many default packages for RedHat Linux with \textbf{.rpm} extension. They need to be converted to \textbf{.deb}(Debian) files to be installed in Ubuntu. To handle .rpm files, \textbf{libnuma} package is required:
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting} 
+$ sudo apt-get install -y rpm alien libnuma1
+\end{lstlisting}
+\end{scriptsize}
+To \textbf{convert rpm format to deb} format and install the Debian packages: 
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}        
+$ alien *.rpm
+$ dpkg -i *.deb 
+\end{lstlisting}
+\end{scriptsize}
+\textbf{3. Installing the Intel OpenCL ICD Loader}
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ sudo ln -s /opt/intel/opencl-1.2-5.2.0.10002/etc/intel64.icd /etc/OpenCL/vendors/intel64.icd
+\end{lstlisting}
+\end{scriptsize}
+\textbf{4. Installing a symbolic link to libOpenCL.so} 
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ sudo ln -s /opt/intel/opencl-1.2-5.2.0.10002/lib64/libOpenCL.so /usr/lib/libOpenCL.so 
+$ sudo ldconfig
+\end{lstlisting}
+\end{scriptsize}
+To check if OpenCL applications run properly, clone the GitHub repository from the link \cite{devquery} and run the Device Query program as follows:   
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ cd OPENCL_EXAMPLES_ZEDBOARD/devquery 
+$ gcc devquery.c -lOpenCL
+\end{lstlisting}
+\end{scriptsize}
+The output should be the available devices in the system (CPU, GPU) as shown in Figure \ref{fig:DeviceQuery}.
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.7\linewidth]{figures/DeviceQuery.png}
+\caption{OpenCL Device Query code Output
+\cite{devquery}}
+\label{fig:DeviceQuery}
+\end{figure}
+\subsubsection*{AOCL SDK and Quartus Installation Steps}
+The FPGA Implementation of MNIST digit recognition \cite{mnist-altera-opencl} uses Altera OpenCL (AOCL) SDK (also called Intel FPGA SDK) and Quartus Software for high-level synthesis and execution. Although our experiments are not based on the Altera Platform, we may use this SDK to use some OpenCL Libraries which are independent of the hardware.\newline \newline
+Intel FPGA SDK for OpenCL™ can be downloaded from \cite{opencl_fpga_sdk}. The installation steps of AOCL and Quartus from the extracted tarball are detailed in \cite{intel_fpga_guide}. Following the installation, the environment variable \textit{\$ALTERAOCLSDKROOT} is by default set to point to the path where the software was installed. A few more environment variables have to be set to inform the software of the FPGA Board in use and the runtime of the host. If the software was installed in the path, say \underline{\textit{/home/intelFPGA\_pro/17.0/hld/}}, then \textit{echo \$ALTERAOCLSDKROOT} returns the same path where software was installed. 
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ export PATH=$ALTERAOCLSDKROOT/bin:$PATH
+$ export AOCL_BOARD_PACKAGE_ROOT=/home/intelFPGA_pro/17.0/hld/board/s5_ref
+$ export QUARTUS_ROOTDIR=/home/intelFPGA_pro/17.0/quartus/bin
+$ export LD_LIBRARY_PATH=$ALTERAOCLSDKROOT/host/linux64/lib:$AOCL_BOARD_PACKAGE_ROOT/linux64/lib:/usr/local/lib:$LD_LIBRARY_PATH
+$ source $ALTERAOCLSDKROOT/init_opencl.sh
+\end{lstlisting}
+\end{scriptsize}
+\textit{\$AOCL\_BOARD\_PACKAGE\_ROOT} has to refer to the path of the FPGA Board in use. \textit{s5\_ref} is a reference platform available with the SDK files. When using a specific platform, the corresponding platform files are downloaded and the path of the files is used as Board Package Root. \newline \newline
+The Altera.icd is copied from \textit{\$ALTERAOCLSDKROOT} to\\ \underline{\textit{/etc/OpenCL/vendors}} and the host application is linked to the ICD Loader using the following lines in the Makefile of the host.
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+AOCL_LDFLAGS=$(shell aocl ldflags)
+AOCL_LDLIBS=$(shell aocl ldlibs)
+
+host_prog : host_prog.o
+g++ -o host_prog host_prog.o $(AOCL_LDFLAGS) -lOpenCL $(AOCL_LDLIBS)
+\end{lstlisting}
+\end{scriptsize}
+These steps are sufficient to run the modified OpenCL code for GPU, without dependencies on Altera platform.
+\subsubsection{Existing Code Flow Description}
+\label{4_1_3_2}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.5\linewidth]{figures/opencl_flow_lenet5.png}
+\caption{OpenCL code flow for Sample (single image recognition) mode \cite{mnist-altera-opencl}}
+\label{fig:opencl_flow_lenet5}
+\end{figure}
+The OpenCL implementation of MNIST/Lenet-5 architecture available in the repository \cite{mnist-altera-opencl} is specific to Altera FPGA devices. In order to make this implementation generic and executable on CPU and GPU, the existing code flow has been examined. Figure \ref{fig:opencl_flow_lenet5} shows the sequence of steps that are done when the a sample image has to be identified.\newline \newline
+The first step is the initialization of parameters for all layers in the CNN. This is followed by allocation of buffers necessary for storing inputs and outputs of all layers on the global memory of the device, which is also accessible by the host. The function \textit{ findPlatform()} searches for relevant strings such as Intel FPGA SDK for OpenCL, Altera SDK, etc. When a match-word "Altera" is given as argument to this function, it looks for an Altera platform. Should the platform be available, the next step is to query all OpenCL devices in this platform and set one of them as the target device. \newline\newline
+The OpenCL Runtime Environment requires a \textbf{context} to manage memory, program, command issue, kernels, and program execution on the device for which the context is defined. Following the context creation, the source code to be ported to GPU is read into a program object.\newline\newline
+There are two ways to compile a kernel \cite{opencl_book_html}. \textbf{Online compilation} involves reading of the kernel source code by the host and building of the source code at runtime by the OpenCL Runtime library. For this, the API \textit{clCreateProgramWithSource()} is used, followed by the API \textit{clBuildProgram()}. This method is not recommended for embedded systems which serve real-time applications. If the kernel is pre-compiled using an OpenCL compiler, the kernel binary is already available and is directly read by the host program, skipping the runtime compilation. This is called \textbf{Offline compilation} and requires only one OpenCL function \textit{clCreateProgramWithBinary()}. Although this saves the time to compile the kernel source during runtime, it is platform-specific. If the same kernel code is to be offloaded to other platforms, then a different set of binaries should be generated. Inclusion of multiple kernel binaries increases the size of the executable.
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.7\linewidth]{figures/kernel_compilation.PNG}
+\caption{Kernel Compilation Modes \cite{opencl_book_html}}
+\label{fig:kernel_compilation}
+\end{figure}
+The reference code \cite{mnist-altera-opencl} is specific to Altera devices and hence uses offline compilation flow, due to the availability of pre-compiled binary.\newline\newline
+Next, a \textbf{command queue} is created which instructs which command has to be executed in which device of the group of devices in a particular context. It also dictates whether the execution should occur in-order or out-of-order. Because the intention is to accelerate the entire ConvNet, all layer operations are offloaded to the GPUs. Hence, kernel objects are created for Convolution, Maxpooling, Inner Product and Activation Layers (ReLU and Softmax). In order t execute the kernel calls on the OpenCL device, memory has to allocated, which is enough to support the weights, biases and IO dimensions for all 8 layers of the Lenet-5 Model.\newline\newline
+The input image pixels are read and normalized. The kernel code is executed on the decide after the kernel arguments are supplied to all layers. The final result, i.e. the digit with maximum likelihood is read from the device, buffers and memory objects freed.
+\subsubsection{Modifications to remove Platform Dependencies}
+\label{4_1_3_3}
+\textbf{Allocation of Buffers on the Device Memory:}\newline
+For Altera FPGAs, the Altera Offline Compiler (AOC) is responsible for generation of logic to support memory accesses \cite{alteraopencl}. 
+\begin{figure}[h!]
+ \centering
+ \includegraphics[width=0.5\linewidth]{figures/global_mem_partitions.png}
+ \caption{Default (bus-interleaved) vs. Manual Global Memory Partitioning
+ \cite{alteraopencl}}
+ \label{fig:global_mem_partitions}
+\end{figure}
+It uses the device SDRAM as global memory and by default, stores the data in a burst-interleaved fashion across various external memory banks. Although this offers uniform load distribution and better balance between the banks, manual partitioning of the data may come in handy for certain applications. For example, when the memory banks support different types, data cannot be impartially interleaved to these banks. AOC directs the kernels to use up contiguous memory locations in the global memory when load and store operations occurring sequentially during kernel execution. \newline \newline
+The code \cite{mnist-altera-opencl} uses optimized global memory access using memory banks instead of default allocation of data in the global memory in burst fashion. 
+Here, the data has been stored in Bank 1 while the weights and biases are stored in Bank 2 for efficient global memory access. However, in case of GPUs, memory banks refer to partitioning of shared memory into equal blocks which can be accessed simultaneously. Bank conflicts due to certain access patterns can slow down the GPU performance \cite{gpu_mem_bank}. Hence, the first step to removing platform dependencies is removal of flags CL\_MEM\_BANK\_1\_ALTERA and CL\_MEM\_BANK\_2\_ALTERA which characterize Altera memory banks (Refer \ref{cnncode1:altera-dep-removal}).\newline \newline
+\definecolor{hg}{rgb}{0.75,1.0,0.75}
+\definecolor{hr}{rgb}{1.0,0.92,0.8}
+\newcommand{\grn}{\makebox[0pt][l]{\color{hg}\rule[-4pt]{0.9\linewidth}{10pt}}}
+\newcommand{\rd}{\makebox[0pt][l]{\color{hr}\rule[-4pt]{0.9\linewidth}{10pt}}}
+\lstset { %
+	language=C,
+	backgroundcolor=\color{white},
+	basicstyle=\ttfamily\tiny,
+	keywordstyle=\color{magenta}\ttfamily,
+	stringstyle=\color{blue}\ttfamily,
+	commentstyle=\color{green}\ttfamily,
+    breakatwhitespace=false,
+	breaklines=true,
+    showstringspaces=false, 
+    escapeinside={<@}{@>}
+}
+\noindent\begin{minipage}{.45\textwidth}
+\begin{lstlisting}[caption=Header files for Altera FPGA,frame=tlrb]{Name}
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <unistd.h>
+#include <math.h>
+<@\textcolor{red}{\textbf{\#include "CL/opencl.h"}}@>
+<@\textcolor{red}{\textbf{\#include "AOCLUtils/aocl\_utils.h}}@>
+#include "cnn_structs.h"
+#include "pgm.h"
+#include "lenet5_model.h"
+
+<@\textcolor{red}{\textbf{using namespace aocl\_utils;}}@>
+using namespace std;
+\end{lstlisting}
+\end{minipage}\hfill
+\begin{minipage}{.45\textwidth}
+\begin{lstlisting}[caption=Header files for \\ GPU,frame=tlrb]{Name}
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <unistd.h>
+#include <math.h>
+<@\textcolor{green}{\textbf{\#include <CL/cl.h>}}@>
+<@\textcolor{green}{\textbf{\#include <CL/cl\_ext.h>}}@>
+#include "cnn_structs.h"
+#include "pgm.h"
+#include "lenet5_model.h"
+
+using namespace std;
+\end{lstlisting}
+\end{minipage}\newline
+\textbf{Usage of Generic OpenCL headers} \newline
+Although AOCL Utility is a platform independent C++ header file, it has been replaced with standard OpenCL headers for the sake of generality. All APIs in the scope of AOCL Utility namespace are substituted by general OpenCL APIs described in \cite{opencl_khronos}. \newline \newline
+\textbf{Kernel Loading Mechanism}\newline
+On-the-fly kernel loading, i.e. Online compilation method explained in subsection \ref{4_1_3_2} is employed. The existing and modified code changes are depicted clearly in \ref{cnncode3:altera-opencl-init}, \ref{cnncode4:gpu-opencl-init} and \ref{cnncode2:load-kernel-source}.\newline \newline
+\textbf{Changes to Makefile}\newline
+As the test platform contains an Intel CPU and NVIDIA GPU, the Intel OpenCL Library (which is a part of the Intel FPGA SDK for OpenCL) is required. \textit{libOpenCL.so} Shared Library is linked in the Makefile as shown in Figure \ref{fig:makefile}.\newline \newline
+After these changes, the resultant code is free of any dependencies with Altera platform and Intel FPGA SDK. The code can be compiled and run on any OpenCL device.
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.7\linewidth]{figures/makefile.png}
+\caption{Linking libOpenCL Library to Makefile}
+\label{fig:makefile}
+\end{figure}
+\subsubsection{Compiling and executing the code}
+\label{4_1_3_4}
+After the changes listed above are done, there are two modes in which the application can be run as follows:\newline\newline
+\underline{To test a sample image:}\newline
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ make run
+\end{lstlisting}
+\end{scriptsize}
+\underline{To test the full MNIST Dataset:}\newline
+\begin{scriptsize}
+\linuxbash
+\begin{lstlisting}
+$ make test
+\end{lstlisting}
+\end{scriptsize}
+The path of the test images (sample and full dataset) is also supplied to the host using the Makefile. Hence, the path has to be suitably modified to point to the test images in the local machine.\newline\newline
+The kernels can be executed either in CPU or GPU devices which support OpenCL.\newline
+\hfill
+\begin{minipage}{\textwidth}
+\begin{center}
+\begin{lstlisting}[caption= CPU or GPU Device Selection,frame=tlrb]{Name}
+int gpu = 1;
+for(unsigned i = 0;i < dev_cnt; i++){
+   err = clGetDeviceIDs(platform_ids[i], gpu ? CL_DEVICE_TYPE_GPU : CL_DEVICE_TYPE_CPU, 1, &target_device, NULL);
+   if(err == CL_SUCCESS){
+      break;
+   }
+}
+\end{lstlisting}
+\end{center}
+\end{minipage}
+When the integer variable \textit{'gpu'} is set to 1, the GPU device is selected and when it is set to 0, the CPU device is selected.
+\subsubsection*{Benchmarking Kernel Execution Time}
+\begin{itemize}
+\item Profiling should be enabled during the creation of command queue as follows:\\
+\begin{minipage}{\textwidth}
+\begin{center}
+\begin{lstlisting}[columns=fullflexible, language=C++, escapechar = \$, backgroundcolor=\color{gray!10}]
+queue = clCreateCommandQueue(context, target_device, $\textcolor{red}{CL\_QUEUE\_PROFILING\_ENABLE}$, &status); 
+checkError(status, "Failed to create command queue");
+\end{lstlisting}
+\end{center}
+\end{minipage}
+\item An event is associated with the kernel during its launch as follows:\\
+\begin{minipage}{\textwidth}
+\begin{center}
+\begin{lstlisting}[columns=fullflexible, language=C++, escapechar = \$, backgroundcolor=\color{gray!10}]
+status = clEnqueueNDRangeKernel(queue, kernel[0], 3, NULL, global_work_size, NULL, 0, NULL, $\textcolor{red}{\&kernel\_event[0]}$);
+checkError(status, "Failed to launch conv1 kernel");
+\end{lstlisting}
+\end{center}
+\end{minipage}
+\item Kernel execution has to be completed and also all enqueued tasks in the command queue should finish.\\
+\begin{minipage}{\textwidth}
+\begin{center}
+\begin{lstlisting}[columns=fullflexible, language=C++, escapechar = \$, backgroundcolor=\color{gray!10}]
+clWaitForEvent(1, &kernel_event[0]);
+clFinish(queue);
+\end{lstlisting}
+\end{center}
+\end{minipage}
+\item The following APIs can be used to estimate the kernel execution time:\\
+\begin{minipage}{\textwidth}
+\begin{center}
+\begin{lstlisting}[columns=fullflexible, language=C++, escapechar = \$, backgroundcolor=\color{gray!10}]
+cl_ulong start_time, end_time;
+double total_time;
+clGetEventProfilingInfo(kernel_event[0], CL_PROFILING_COMMAND_START, sizeof(start_time), &start_time, NULL);
+clGetEventProfilingInfo(kernel_event[0], CL_PROFILING_COMMAND_END, sizeof(end_time), &end_time, NULL);
+total_time = end_time-start_time;
+printf("Kernel Execution Time is: %0.3f \n",total_time/1000000.0);
+\end{lstlisting}
+\end{center}
+\end{minipage}
+\end{itemize}
+\subsection{Comparative Study of Results}
+\label{4_1_4}
+\textbf{Test Devices}
+\begin{enumerate}
+\item \textbf{Intel OpenCL} from Intel(R) Corporation \\
+OpenCL Version: OpenCL 1.2 LINUX\\
+Compute Units: 4
+\item \textbf{NVIDIA CUDA} from NVIDIA Corporation\\ 
+OpenCL Version: OpenCL 1.1 CUDA 4.2.1\\
+Compute Units:2
+\end{enumerate}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\begin{table}[htbp]
+\caption{Comparison of kernel runtime in various OpenCL Devices}
+\centering
+\begin{tabular}{@{}p{0.25\textwidth}*{2}{L{\dimexpr0.22\textwidth-2\tabcolsep\relax}}@{}}
+\toprule
+& \multicolumn{2}{c}{Kernel Execution Time (ms)} \\
+\cmidrule(r{4pt}){2-3} & Intel Core i3-2350M CPU @ 2.30GHz (4 CUs) & NVIDIA GeForce 315M (2 CUs)\\
+\midrule
+Convolution 1 & \makecell[c]{0.216} & \makecell[c]{0.707}\\
+\midrule
+MaxPool 1 &\makecell[c]{0.046} &\makecell[c]{0.166} \\
+\midrule
+Convolution 2 &\makecell[c]{0.716} &\makecell[c]{11.332} \\
+\midrule
+Maxpool 2 &\makecell[c]{0.026} &\makecell[c]{0.371} \\
+\midrule
+Inner Product 1&\makecell[c]{0.187} &\makecell[c]{1.651} \\
+\midrule
+ReLU &\makecell[c]{0.011} &\makecell[c]{0.012} \\
+\midrule
+Inner Product 2&\makecell[c]{0.010} &\makecell[c]{0.287} \\
+\midrule
+Softmax &\makecell[c]{0.014} &\makecell[c]{0.012} \\
+\bottomrule
+\end{tabular}
+\label{table:results_compare_cnn}
+\end{table}

@@ -1,0 +1,225 @@
+\documentclass[12pt,oneside]{report}
+\usepackage[titletoc]{appendix}
+\usepackage{setspace}
+\usepackage{amsmath}
+\usepackage[pdftex]{graphicx}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{todonotes}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{calc}
+\usepackage{array}
+\usepackage{rotating}
+\usepackage{url}
+\usepackage{pgf,tikz}
+\usetikzlibrary{snakes,arrows,shapes}
+\usepackage{adjustbox}
+\usepackage{dot2texi}
+\usepackage[normal]{subfigure}
+\usepackage{multirow}
+\usepackage{todonotes}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{pgf,tikz}
+\usepackage{amsmath}
+\usepackage{mdwlist}
+\usepackage{xcolor}
+\usepackage{adjustbox}
+\usepackage{dot2texi}
+\usepackage{pgfplots, pgfplotstable}
+\usepackage{amsmath}
+\makeatletter
+\newif\if@restonecol
+\makeatother
+\let\algorithm\relax
+\let\endalgorithm\relax
+\usepackage[ruled]{algorithm2e}
+\usepackage{multirow}
+\usepackage[center]{caption}
+\usepackage{xcolor}
+\usepackage{calc}
+\usepackage{acro}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{color}
+\usepackage{diagbox}
+\usepackage[thinlines]{easytable}
+\usepackage{makecell}
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;} 
+\def\scalecheck{\resizebox{\widthof{\checkmark}*\ratio{\widthof{x}}{\widthof{\normalsize x}}}{!}{\checkmark}}
+\usetikzlibrary{arrows,backgrounds}
+\usetikzlibrary{arrows,automata,calc,shapes,positioning,shadows,trees}
+\pgfplotsset{compat=newest}
+\tikzset{
+  basic/.style  = {draw, text width=2cm, font=\sffamily, rectangle},
+  root/.style   = {basic, rounded corners=2pt, thin, align=center,
+                   fill=white!90},
+  level 2/.style = {basic, rounded corners=6pt, thin,align=center, fill=white!90,
+                   text width=8em},
+  level 3/.style = {basic, thin, align=left, fill=white!90, text width=6.5em}
+}
+\definecolor{verde}{rgb}{0.25,0.5,0.35}
+\definecolor{jpurple}{rgb}{0.5,0,0.35}
+\definecolor{darkgreen}{rgb}{0.0, 0.2, 0.13}
+\newcommand{\linuxbash}{
+\lstset{
+    language=bash,
+    basicstyle=\ttfamily\small,
+    extendedchars=true,
+    showspaces=false,
+    showstringspaces=false,
+    numbers=left,
+    numberstyle=\tiny,
+    breaklines=true,
+    backgroundcolor=\color{gray!10},
+    breakautoindent=true,
+    captionpos=b,
+    xleftmargin=0pt,
+    tabsize=2
+}}
+
+% class `abbrev': abbreviations:
+\DeclareAcronym{ALU}{
+  short = ALU ,
+  long  = Arithmetic and Logic Unit  ,
+  class = abbrev
+}
+\DeclareAcronym{API}{
+  short = API ,
+  long  = Application Programming Interface  ,
+  class = abbrev
+}
+\DeclareAcronym{ASIC}{
+  short = ASIC ,
+  long  = Application Specific Integrated Circuit,
+  class = abbrev
+}
+\DeclareAcronym{CPU}{
+	short = CPU ,
+	long  = Central Processing Unit ,
+	class = abbrev
+}
+\DeclareAcronym{CNN}{
+	short = CNN ,
+	long  = Convolutional Neural Network ,
+	class = abbrev
+}
+\DeclareAcronym{CU}{
+	short = CU ,
+	long  = Compute Unit ,
+	class = abbrev
+}
+\DeclareAcronym{DSP}{
+	short = DSP ,
+	long  = Digital Signal Processor ,
+	class = abbrev
+}
+\DeclareAcronym{FPGA}{
+  short = FPGA ,
+  long  =  Field Programmable Gate Array  ,
+  class = abbrev
+}
+\DeclareAcronym{GOPS}{
+  short = GOPS,
+  long = Giga Operations per Second,
+  class = abbrev
+}
+\DeclareAcronym{GPU}{
+	short = GPU ,
+	long  = Graphics Processing Unit ,
+	class = abbrev
+}
+\DeclareAcronym{ISA}{
+  short = ISA ,
+  long  = Instruction Set Architecture ,
+  class = abbrev
+}
+
+\DeclareAcronym{MLP}{
+	short = MLP ,
+	long  = Multi Layer Perceptron ,
+	class = abbrev
+}
+\DeclareAcronym{MNIST}{
+	short = MNIST ,
+	long  = Mixed National Institute of Standards and Technology ,
+	class = abbrev
+}
+\DeclareAcronym{PE}{
+  short = PE ,
+  long  = Processing Element  ,
+  class = abbrev
+}
+
+\usepackage{upquote}
+\makeatletter
+
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage{url}
+\usepackage{tikz}
+\usepackage{pgf,tikz}
+\usepackage{textgreek}
+\usepackage{hhline}
+\usepackage{array}
+\usetikzlibrary{calc,arrows}
+\usepackage{amsmath}
+\usepackage{changepage}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+\renewcommand{\topfraction}{0.9}	% max fraction of floats at top
+\renewcommand{\bottomfraction}{0.8}	% max fraction of floats at bottom
+%Parameters for TEXT pages (not float pages):
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}     % 2 may work better
+\setcounter{dbltopnumber}{2}    % for 2-column pages
+\renewcommand{\dbltopfraction}{0.9}	% fit big float above 2-col. text
+\renewcommand{\textfraction}{0.07}	% allow minimal text w. figs
+
+%Parameters for FLOAT pages (not text pages):
+\renewcommand{\floatpagefraction}{0.7}	% require fuller float pages
+
+%N.B.: floatpagefraction MUST be less than topfraction !!
+\renewcommand{\dblfloatpagefraction}{0.7}	% requires fuller float pages
+%remember to use [htp] or [htpb] for placement
+
+
+\begin{document}
+
+\input{content/title_page}
+\pagenumbering{roman}
+\input{content/0_abstract_ack}
+\tableofcontents
+\listoffigures
+\listoftables
+\clearpage
+
+\pagenumbering{arabic}
+\onehalfspacing
+\input{content/1_introduction}
+\input{content/2_background}
+\input{content/3_literature_review}
+\input{content/4_cnn}
+\input{content/5_fhew}
+\input{content/6_conclusion}
+
+\begin{appendices}
+	
+\chapter{CNN}
+\input{figures_tex/appendix_cnn}
+	
+\chapter{FHEW}
+\input{figures_tex/appendix_fhew}
+\end{appendices}
+
+\bibliographystyle{unsrt}
+\bibliography{content/references.bib}
+
+\end{document}
