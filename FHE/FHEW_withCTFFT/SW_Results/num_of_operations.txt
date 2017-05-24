@@ -1,0 +1,110 @@
+jsk_027@toshiba:~/Thesis/FHEW_Profiling/FHEW$ ./fhewTest n
+Setting up FHEW 
+Generating secret key ...  Done.
+Generating evaluation key ... this may take a while ...  Done.
+
+Testing homomorphic NAND 0 times.
+Circuit shape : (a NAND b) NAND (c NAND d)
+
+AddToAcc occured 0 times..
+Number of times FFTForward occured = 396002
+Number of times FFTBackward occured = 132000
+Number of homomorphic NAND = 0
+
+Passed all tests!
+-----------------------------------------------------------------
+jsk_027@toshiba:~/Thesis/FHEW_Profiling/FHEW$ ./fhewTest 1
+Setting up FHEW 
+Generating secret key ...  Done.
+Generating evaluation key ... this may take a while ...  Done.
+
+Testing homomorphic NAND 1 times.
+Circuit shape : (a NAND b) NAND (c NAND d)
+
+Enc(1)  NAND  Enc(1)  =  Enc(0)
+Enc(1)  NAND  Enc(1)  =  Enc(0)
+Enc(0)  NAND  Enc(0)  =  Enc(1)
+
+AddToAcc occured 2868 times..
+Number of times FFTForward occured = 499286
+Number of times FFTBackward occured = 166422
+Number of homomorphic NAND = 3
+
+Passed all tests!
+-------------------------------------------------------------------
+jsk_027@toshiba:~/Thesis/FHEW_Profiling/FHEW$ ./fhewTest 1
+Setting up FHEW 
+Generating secret key ...  Done.
+Generating evaluation key ... this may take a while ...  Done.
+
+Testing homomorphic NAND 1 times.
+Circuit shape : (a NAND b) NAND (c NAND d)
+
+Enc(1)  NAND  Enc(1)  =  Enc(0)
+Enc(1)  NAND  Enc(1)  =  Enc(0)
+Enc(0)  NAND  Enc(0)  =  Enc(1)
+
+AddToAcc occured 2872 times..
+Number of times FFTForward occured = 499430
+Number of times FFTBackward occured = 166470
+Number of homomorphic NAND = 3
+
+Passed all tests!
+-------------------------------------------------------------------
+jsk_027@toshiba:~/Thesis/FHEW_Profiling/FHEW$ ./fhewTest 1
+Setting up FHEW 
+Generating secret key ...  Done.
+Generating evaluation key ... this may take a while ...  Done.
+
+Testing homomorphic NAND 1 times.
+Circuit shape : (a NAND b) NAND (c NAND d)
+
+Enc(1)  NAND  Enc(1)  =  Enc(0)
+Enc(1)  NAND  Enc(1)  =  Enc(0)
+Enc(0)  NAND  Enc(0)  =  Enc(1)
+
+AddToAcc occured 2872 times..
+Number of times FFTForward occured = 499430
+Number of times FFTBackward occured = 166470
+Number of homomorphic NAND = 3
+
+Passed all tests!
+-------------------------------------------------------------------
+jsk_027@toshiba:~/Thesis/FHEW_Profiling/FHEW$ ./fhewTest 1
+Setting up FHEW 
+Generating secret key ...  Done.
+Generating evaluation key ... this may take a while ...  Done.
+
+Testing homomorphic NAND 1 times.
+Circuit shape : (a NAND b) NAND (c NAND d)
+
+Enc(1)  NAND  Enc(1)  =  Enc(0)
+Enc(1)  NAND  Enc(1)  =  Enc(0)
+Enc(0)  NAND  Enc(0)  =  Enc(1)
+
+AddToAcc occured 2873 times..
+Number of times FFTForward occured = 499466
+Number of times FFTBackward occured = 166482
+Number of homomorphic NAND = 3
+
+Passed all tests!
+-------------------------------------------------------------------
+jsk_027@toshiba:~/Thesis/FHEW_Profiling/FHEW$ ./fhewTest 1
+Setting up FHEW 
+Generating secret key ...  Done.
+Generating evaluation key ... this may take a while ...  Done.
+
+Testing homomorphic NAND 1 times.
+Circuit shape : (a NAND b) NAND (c NAND d)
+
+Enc(1)  NAND  Enc(1)  =  Enc(0)
+Enc(1)  NAND  Enc(1)  =  Enc(0)
+Enc(0)  NAND  Enc(0)  =  Enc(1)
+
+AddToAcc occured 2872 times..
+Number of times FFTForward occured = 499430
+Number of times FFTBackward occured = 166470
+Number of homomorphic NAND = 3
+
+Passed all tests!
+-------------------------------------------------------------------
