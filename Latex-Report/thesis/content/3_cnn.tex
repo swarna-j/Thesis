@@ -1,6 +1,6 @@
 \chapter{Hardware Acceleration using Graphics Processing Unit}
-\label{ch4_cnn}
-It is no secret that many technical giants such as NVIDIA, IBM, Google and Fujitsu have recently invested a lot to train engineers and carry out research in the field of Artificial Intelligence, to harness automated solutions that will bridge the current gap between technology integration and expertise. Deep Learning is an avant-garde approach to imparting knowledge to the machines to achieve the ultimate goal of artificial intelligence, without explicit coding. It is of interest in several domains\cite{wiki_ml}, such as:
+\label{ch3_cnn}
+Deep Learning is an avant-garde approach to imparting knowledge to the machines to achieve the ultimate goal of artificial intelligence without explicit coding, and bridge the current gap between technology integration and expertise. It is of interest in several domains\cite{wiki_ml}, such as:
 \begin{itemize}
 \item Self-driving cars, Automated flight control, Handwriting and Voice recognition software, which are real-time and cannot be programmed by hand or require intense effort doing so manually.
 \item Database Mining.
@@ -10,9 +10,10 @@ It is no secret that many technical giants such as NVIDIA, IBM, Google and Fujit
 \end{itemize} 
 Claims have been made that off-the-shelf accelerators in the embedded platforms offer an edge over CPU-based systems in deep learning computations\cite{hegde2016caffepresso}. We seek to validate the efficiency of deep-learning methods on heterogeneous architectures with a simple Lenet-5 Model of MNIST Dataset classifier. 
 \section{Deep Learning using Convolutional Neural Networks}
-\label{4_1}
+\label{3_1}
 The Figure \ref{fig:ML_Classification} shows the most common types of learning algorithms. The choice of the algorithm depends on the problem we intend to solve.
 \begin{figure}[h!]
+  \centering
   \includegraphics[width=\linewidth]{figures/ML_Classification.PNG}
   \caption{Types of Machine Learning Algorithms
   \cite{upx_ml}}
@@ -35,7 +36,7 @@ The efficiency of a classifier is determined not just by the correctness in cate
   \cite{lecun1998gradient}}
   \label{fig:classifier_efficiency_formula}
 \end{figure}
-\newline Studies have revealed the relationship between expected error rate on test set and error rate on training set as shown in Figure \ref{fig:classifier_efficiency_formula}. The difference between these two error values decreases as the number of training samples increases. Also, if the complexity of the system “h” increases, training error decreases. Hence, we can infer that the system becomes more robust with more training. 
+\newline Studies have revealed the relationship between expected error rate on test set and error rate on training set as shown in Figure \ref{fig:classifier_efficiency_formula}. The difference between these two error values decreases as the number of training samples increases. Also, if the complexity of the system “h” increases, training error decreases. Hence, we infer that the system becomes more robust with more training. 
 \newline \newline
 The traditional machine learning approach involves handcrafting features of interest, which can take painstaking amount of time and effort, coupled with domain expertise. Feature engineering in Deep nets is automatic and more accurate in comparison to conventional methods \cite{dlintro_am}.
 \begin{figure}[h!]
@@ -49,7 +50,7 @@ The traditional machine learning approach involves handcrafting features of inte
 Owing to high computational complexity, CNN usage is restricted, especially in portable devices \cite{gysel2016hardware}. 
 
 \subsection{MNIST Digit Recognition using Lenet-5 ConvNet}
-\label{4_1_1}
+\label{3_1_1}
 The Lenet-5 Architecture for handwritten digit recognition was first conceived by LeCun et al. in 1998. The MNIST(Modified National Institute of Standards and Technology) database consisting of 60000 training samples and 10000 test inputs available for download in \cite{mnist_database} was used for the experiments discussed in the paper \cite{lecun1998gradient}. This paper proved the general consensus \ref{fig:deep_learning_flow}  that ConvNets eliminate the need for hand-made feature extractors and are the most efficient. Today, Artificial Intelligence is a buzzword and almost all AI related applications are leveraging ConvNets to achieve the best performance with low runtime complexities. 
 \begin{figure}[h!]
   \centering
@@ -102,13 +103,13 @@ The output of a filter covering a particular region of the input x can be interp
   \cite{cnn_ytak}}
   \label{fig:ConvLayer_1}
 \end{figure}
-\subsubsection{MaxPool Layer:}
+\subsubsection{MaxPool Layer}
 \begin{figure}[h!]
-  \centering
-  \includegraphics[width=0.7\linewidth]{figures/maxpool.PNG}
-  \caption{Max Pooling
-  \cite{cnn_ak}}
-  \label{fig:maxpool}
+\centering
+\includegraphics[width=0.7\linewidth]{figures/maxpool.PNG}
+\caption{Max Pooling
+\cite{cnn_ak}}
+\label{fig:maxpool}
 \end{figure}
 Down-sampling layer which operates independently on all activation maps.
 \textbf{Required Hyperparameters:}
@@ -188,10 +189,10 @@ Different versions of MNIST Datasets have been introduced over the years. The fi
 \label{table:hyperparams}
 \end{table}
 \subsection{Experiments with C++ Code}
-\label{4_1_2}
+\label{3_1_2}
 
 \subsubsection{Prerequisites}
-\label{4_1_2_1}
+\label{3_1_2_1}
 Performance Application Programming Interface (also called PAPI) offers interfaces to hardware performance counters in the underlying platform. These counters count the number of occurrences of a specific event or signal related to the functioning of the processor. This library is used to benchmark the test application and can be installed as follows:
 \begin{scriptsize}
 \linuxbash
@@ -251,7 +252,7 @@ $ export LD_LIBRARY_PATH=/usr/local/lib
 \end{lstlisting}
 \end{scriptsize}
 \subsubsection{Existing Code Flow Description}
-\label{4_1_2_2}
+\label{3_1_2_2}
 Figure \ref{fig:CPP_flow_lenet5} shows the code flow in software. The model is pre-trained using Caffe framework and the weights and biases are stored in the file lenet5\_model.cpp for use in the main application.\newline
 There are two Application modes, namely \textit{Sample} and \textit{Test}. The \textit{Sample} mode is used when a MNIST single image has to be identified. The \textit{Test} mode is to test the full MNIST dataset, compare the predicted digit against the pre-defined image label and calculate the prediction accuracy.\newline\newline
 \begin{figure}[h!]
@@ -304,7 +305,7 @@ In order to identify the acceleration hot-spots, each operation of the ConvNet w
 \centering
 \begin{tabular}{l c}
 \toprule
-Layers & Computation Time (usec)\\
+\textbf{Layers }& \textbf{Computation Time ($\mu$s)}\\
 \midrule
 Convolution 1 &12308\\
 \midrule
@@ -325,16 +326,16 @@ Softmax&9\\
 \end{tabular}
 \label{table:sw_hotspots}
 \end{table}
-The convolution layer involves about 86\% ((12308+48164)/70029) of the required arithmetic operations in the ConvNets framework. Following this, the fully connected layers are the next most resource-intensive layers. 
+The convolution layer involves about 86\% ((12308+48164)/70029) of the required arithmetic operations in the ConvNet framework. Following this, the fully connected layers are the next most resource-intensive layers. 
 \subsubsection{Improvements}
-\label{4_1_2_3}
+\label{3_1_2_3}
 One approach to minimizing data transfer to off-chip memory is by using reduced bit-width fixed point numbers, realizable by using open-source fixed point arithmetic libraries like LibFi \cite{LibFi}. This approach is very straightforward and promises speedup, reduced area and consequently reduced energy consumption. However, the specifics of this approach are beyond the scope of this thesis. \newline \newline
 We intend to port the various layers of the ConvNet into Graphics Processing Unit for concurrent execution and significant speedup. This requires some understanding of the OpenCL device models discussed in Section \ref{2_3_1}
 Each platform comes with a ready-to-use library which may pose optimization challenges, especially when designing larger applications.  Yet another challenge is mapping, owing to differences in on-chip memory, kinds of parallelism that a particular accelerator can support and communication bandwidth. We seek to accelerate the layers of the ConvNet by using fine-grained GPUs which exhibit a high degree of data-parallelism.
 \subsection{Experiments with OpenCL Code}
-\label{4_1_3}
+\label{3_1_3}
 \subsubsection{Pre-requisites}
-\label{4_1_3_1}
+\label{3_1_3_1}
 \subsubsection*{OpenCL Setup in Ubuntu 14.04}
 The following are required to run OpenCL Applications on the system: 
 \begin{itemize}
@@ -452,9 +453,9 @@ host_prog : host_prog.o
 g++ -o host_prog host_prog.o $(AOCL_LDFLAGS) -lOpenCL $(AOCL_LDLIBS)
 \end{lstlisting}
 \end{scriptsize}
-These steps are sufficient to run the modified OpenCL code for GPU, without dependencies on Altera platform.
+
 \subsubsection{Existing Code Flow Description}
-\label{4_1_3_2}
+\label{3_1_3_2}
 \begin{figure}[h!]
 \centering
 \includegraphics[width=0.5\linewidth]{figures/opencl_flow_lenet5.png}
@@ -472,10 +473,10 @@ There are two ways to compile a kernel \cite{opencl_book_html}. \textbf{Online c
 \label{fig:kernel_compilation}
 \end{figure}
 The reference code \cite{mnist-altera-opencl} is specific to Altera devices and hence uses offline compilation flow, due to the availability of pre-compiled binary.\newline\newline
-Next, a \textbf{command queue} is created which instructs which command has to be executed in which device of the group of devices in a particular context. It also dictates whether the execution should occur in-order or out-of-order. Because the intention is to accelerate the entire ConvNet, all layer operations are offloaded to the GPUs. Hence, kernel objects are created for Convolution, Maxpooling, Inner Product and Activation Layers (ReLU and Softmax). In order t execute the kernel calls on the OpenCL device, memory has to allocated, which is enough to support the weights, biases and IO dimensions for all 8 layers of the Lenet-5 Model.\newline\newline
-The input image pixels are read and normalized. The kernel code is executed on the decide after the kernel arguments are supplied to all layers. The final result, i.e. the digit with maximum likelihood is read from the device, buffers and memory objects freed.
+Next, a \textbf{command queue} is created which instructs which command has to be executed in which device of the group of devices in a particular context. It also dictates whether the execution should occur in-order or out-of-order. Because the intention is to accelerate the entire ConvNet, kernel objects are created for Convolution, Maxpooling, Inner Product and Activation Layers (ReLU and Softmax). Enough memory has to allocated on the OpenCL device to support the weights, biases and IO dimensions and execution of kernel calls for all 8 layers of the Lenet-5 Model. \newline\newline
+The input image pixels are read and normalized. The kernel code is executed on the device after the kernel arguments are supplied to all layers. The final result, i.e. the digit with maximum likelihood is read from the device, buffers and memory objects freed.
 \subsubsection{Modifications to remove Platform Dependencies}
-\label{4_1_3_3}
+\label{3_1_3_3}
 \textbf{Allocation of Buffers on the Device Memory:}\newline
 For Altera FPGAs, the Altera Offline Compiler (AOC) is responsible for generation of logic to support memory accesses \cite{alteraopencl}. 
 \begin{figure}[h!]
@@ -485,9 +486,9 @@ For Altera FPGAs, the Altera Offline Compiler (AOC) is responsible for generatio
  \cite{alteraopencl}}
  \label{fig:global_mem_partitions}
 \end{figure}
-It uses the device SDRAM as global memory and by default, stores the data in a burst-interleaved fashion across various external memory banks. Although this offers uniform load distribution and better balance between the banks, manual partitioning of the data may come in handy for certain applications. For example, when the memory banks support different types, data cannot be impartially interleaved to these banks. AOC directs the kernels to use up contiguous memory locations in the global memory when load and store operations occurring sequentially during kernel execution. \newline \newline
-The code \cite{mnist-altera-opencl} uses optimized global memory access using memory banks instead of default allocation of data in the global memory in burst fashion. 
-Here, the data has been stored in Bank 1 while the weights and biases are stored in Bank 2 for efficient global memory access. However, in case of GPUs, memory banks refer to partitioning of shared memory into equal blocks which can be accessed simultaneously. Bank conflicts due to certain access patterns can slow down the GPU performance \cite{gpu_mem_bank}. Hence, the first step to removing platform dependencies is removal of flags CL\_MEM\_BANK\_1\_ALTERA and CL\_MEM\_BANK\_2\_ALTERA which characterize Altera memory banks (Refer \ref{cnncode1:altera-dep-removal}).\newline \newline
+It uses the device SDRAM as global memory and by default, stores the data in a burst-interleaved fashion across various external memory banks. Although this offers uniform load distribution and better balance between the banks, manual partitioning of the data may come in handy for certain applications. For example, when the memory banks support different data-types, data cannot be impartially interleaved to these banks. \newline \newline
+The code \cite{mnist-altera-opencl} accesses global memory using optimized memory banks instead of default burst data allocation in the global memory. 
+For efficient global memory access, the weights and biases are stored in Bank 2 while the data is stored in Bank 1. However, the memory banks in the GPU context refer to partitioning of shared memory into equal blocks which can be accessed simultaneously. Bank conflicts due to certain access patterns can slow down the GPU performance \cite{gpu_mem_bank}. Hence, the first step to removing platform dependencies is removal of flags CL\_MEM\_BANK\_1\_ALTERA and CL\_MEM\_BANK\_2\_ALTERA which characterize Altera memory banks (Refer \ref{cnncode1:altera-dep-removal}).\newline \newline
 \definecolor{hg}{rgb}{0.75,1.0,0.75}
 \definecolor{hr}{rgb}{1.0,0.92,0.8}
 \newcommand{\grn}{\makebox[0pt][l]{\color{hg}\rule[-4pt]{0.9\linewidth}{10pt}}}
@@ -544,10 +545,10 @@ using namespace std;
 \textbf{Usage of Generic OpenCL headers} \newline
 Although AOCL Utility is a platform independent C++ header file, it has been replaced with standard OpenCL headers for the sake of generality. All APIs in the scope of AOCL Utility namespace are substituted by general OpenCL APIs described in \cite{opencl_khronos}. \newline \newline
 \textbf{Kernel Loading Mechanism}\newline
-On-the-fly kernel loading, i.e. Online compilation method explained in subsection \ref{4_1_3_2} is employed. The existing and modified code changes are depicted clearly in \ref{cnncode3:altera-opencl-init}, \ref{cnncode4:gpu-opencl-init} and \ref{cnncode2:load-kernel-source}.\newline \newline
+On-the-fly kernel loading, i.e. Online compilation method explained in subsection \ref{3_1_3_2} is employed. The existing and modified code changes are depicted clearly in \ref{cnncode3:altera-opencl-init}, \ref{cnncode4:gpu-opencl-init} and \ref{cnncode2:load-kernel-source}.\newline \newline
 \textbf{Changes to Makefile}\newline
-As the test platform contains an Intel CPU and NVIDIA GPU, the Intel OpenCL Library (which is a part of the Intel FPGA SDK for OpenCL) is required. \textit{libOpenCL.so} Shared Library is linked in the Makefile as shown in Figure \ref{fig:makefile}.\newline \newline
-After these changes, the resultant code is free of any dependencies with Altera platform and Intel FPGA SDK. The code can be compiled and run on any OpenCL device.
+\textit{libOpenCL.so} Shared Library is linked in the Makefile as shown in Figure \ref{fig:makefile}. Altera platform specific libraries are unlinked.\newline \newline
+The resultant code is free of any dependencies with Altera platform and hence, can be compiled and run on any OpenCL device.
 \begin{figure}[h!]
 \centering
 \includegraphics[width=0.7\linewidth]{figures/makefile.png}
@@ -555,8 +556,7 @@ After these changes, the resultant code is free of any dependencies with Altera 
 \label{fig:makefile}
 \end{figure}
 \subsubsection{Compiling and executing the code}
-\label{4_1_3_4}
-After the changes listed above are done, there are two modes in which the application can be run as follows:\newline\newline
+\label{3_1_3_4}
 \underline{To test a sample image:}\newline
 \begin{scriptsize}
 \linuxbash
@@ -571,7 +571,7 @@ $ make run
 $ make test
 \end{lstlisting}
 \end{scriptsize}
-The path of the test images (sample and full dataset) is also supplied to the host using the Makefile. Hence, the path has to be suitably modified to point to the test images in the local machine.\newline\newline
+The path of the test images (sample and full dataset) is also supplied to the host through the Makefile. Hence, the path has to be suitably modified to point to the test images in the local machine.\newline\newline
 The kernels can be executed either in CPU or GPU devices which support OpenCL.\newline
 \hfill
 \begin{minipage}{\textwidth}
@@ -632,7 +632,7 @@ printf("Kernel Execution Time is: %0.3f \n",total_time/1000000.0);
 \end{minipage}
 \end{itemize}
 \subsection{Comparative Study of Results}
-\label{4_1_4}
+\label{3_1_4}
 \textbf{Test Devices}
 \begin{enumerate}
 \item \textbf{Intel OpenCL} from Intel(R) Corporation \\

@@ -1,0 +1,180 @@
+\begin{table}[!h]
+\centering
+\caption{AXI-Stream Input-Output data handler}
+\label{fhewcode1:fft_stream}
+\begin{tabular}{l}
+\toprule
+\begin{lstlisting}[columns=fullflexible, language=C++,escapechar=\$]
+#include <hls_video.h> //for streaming data
+#include <ap_axi_sdata.h> //for defining channel attributes
+typedef ap_axiu<64,1,1,1> IOchannel; // <data, user, ID, destination>
+
+void handleFFT(hls::stream<IOchannel> &inStream, hls::stream<IOchannel> &outStream)
+{
+#pragma HLS INTERFACE axis port=inStream
+#pragma HLS INTERFACE axis port=outStream
+    IOchannel inChannel, outChannel;
+    complex_t input[2*N], output[N];
+    int idx;
+    for(idx = 0; idx < 2*N; idx++)
+    {
+    #pragma HLS PIPELINE
+        //Read and Cache Input channel value once (Block here if FIFO sender is empty)
+        inChannel = inStream.read();
+        input[idx].re = *((double*) (&inChannel.data));
+        inChannel = inStream.read();
+        input[idx].im = *((double*) (&inChannel.data));
+    }
+    FFT(input, output);
+    outChannel.keep = inChannel.keep;
+    outChannel.strb = inChannel.strb;
+    outChannel.user = inChannel.user;
+    outChannel.id   = inChannel.id;
+    outChannel.dest = inChannel.dest;
+    outChannel.last = 0;
+
+    for(idx = 0; idx < N-1; idx++)
+    {
+		outChannel.data = *((ap_uint<64> *)(&output[idx].re));
+		outStream.write(outChannel); //Reference: Vivado Design Suite User Guide
+		outChannel.data = *((ap_uint<64> *)(&output[idx].im));
+		outStream.write(outChannel);
+    }
+    outChannel.data = *((ap_uint<64> *)(&output[idx].re));
+    outStream.write(outChannel);
+    outChannel.data = *((ap_uint<64> *)(&output[idx].im));
+    outStream.write(outChannel);
+    outChannel.last = 1;
+}
+\end{lstlisting}
+\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!h]
+\centering
+\caption{Non-recursive 1-D FFT}
+\label{fhewcode2:fft1}
+\begin{tabular}{l}
+\toprule
+\begin{lstlisting}[columns=fullflexible, language=C++,escapechar=\$]
+#include "fft.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <complex>
+
+#define PI 3.1415926535897932384626434
+#define N 1024
+typedef struct complex_t {
+    double re;
+    double im;
+} complex_t;
+
+void FFT(complex_t input[2*N], complex_t output[N])
+{
+    int k, n;
+    complex_t mul_res, conv_res, add_res;
+    // Compute N DFTs of length 1 using naive method
+    FFT_label0:for (k = 0; k < N; k++)
+    {
+       conv_res.re = 1;
+       conv_res.im = 0; // -2*PI*n*k2/N2 --> k2 = 0, n = 0 for 1D Convolution
+       multiply(input[k], conv_res, &mul_res);
+       /* Multiply by the twiddle factors  ( e^(-2*pi*j/N * k1*k2)) and transpose
+          conv_from_polar(1, -2.0*PI*k1*k2/N, &conv_res); --> k2 = 0 for 1D Convolution */
+       multiply(conv_res, mul_res, &mul_res);
+       input[k] = mul_res;
+    }
+
+    for(k = 0; k < N; k++)
+    {
+       output[k].re = 0.0;
+       output[k].im = 0.0;
+       FFT_label2:for(n = 0; n < N; n++)
+       {
+    	  std::complex<double> t = std::polar(1.0, -2 * PI * n* k / N);
+    	  conv_res.re = std::real(t);
+    	  conv_res.im = std::imag(t);
+          multiply(input[n], conv_res, &mul_res);
+          add(output[k], mul_res, &add_res);
+          output[k] = add_res;
+       }
+    }
+ }
+//-------------------Utility Functions-------------------------
+ void add(complex_t left, complex_t right, complex_t* result)
+ {
+    (*result).re = left.re + right.re;
+    (*result).im = left.im + right.im;
+ }
+
+ void multiply(complex_t left, complex_t right, complex_t* result)
+ {
+    (*result).re = left.re*right.re - left.im*right.im;
+    (*result).im = left.re*right.im + left.im*right.re;
+ }
+\end{lstlisting}
+\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!h]
+\centering
+\caption{Radix-2 DIF FFT}
+\label{fhewcode3:CTfft}
+\begin{tabular}{l}
+\toprule
+\begin{lstlisting}[columns=fullflexible, language=C++,escapechar=\$]
+void fft(Complex x[2*N])
+{
+	unsigned int k = N, n;
+	double thetaT = 3.14159265358979323846264338328L / N;
+	Complex phiT = Complex(cos(thetaT), sin(thetaT)), T;
+
+	fft_label0:for(unsigned int i=0; i < 10; i++) 
+//because 2^10 = 1024 - After 9 right shifts, k becomes <= 1 => 2^0 = 1
+	{
+		n = k;
+		k >>= 1;
+		phiT = phiT * phiT;
+		T = 1.0L;
+		fft_label1:for (unsigned int l = 0; l < k; l++)
+		{
+			fft_label2:for (unsigned int a = l; a < N; a += n)
+			{
+				unsigned int b = a + k;
+				Complex t = x[a] - x[b];
+				x[a] = x[a] + x[b];
+				x[b] = t * T;
+			}
+			T *= phiT;
+		}
+	}
+
+	// Decimate
+	unsigned int m = (unsigned int)log2(N);
+	fft_label3:for (unsigned int a = 0; a < N; a++)
+	{
+		unsigned int b = a;
+		// Reverse bits
+		b = (((b & 0xaaaaaaaa) >> 1) | ((b & 0x55555555) << 1));
+		b = (((b & 0xcccccccc) >> 2) | ((b & 0x33333333) << 2));
+		b = (((b & 0xf0f0f0f0) >> 4) | ((b & 0x0f0f0f0f) << 4));
+		b = (((b & 0xff00ff00) >> 8) | ((b & 0x00ff00ff) << 8));
+		b = ((b >> 16) | (b << 16)) >> (32 - m);
+		if (b > a)
+		{
+			Complex t = x[a];
+			x[a] = x[b];
+			x[b] = t;
+		}
+	}
+}
+\end{lstlisting}
+\\
+\bottomrule
+\end{tabular}
+\end{table}
