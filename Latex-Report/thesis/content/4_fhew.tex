@@ -127,7 +127,7 @@ The tabulated values are averages obtained from 5 runs of the application in eac
 \begin{tabular}{@{}m{0.5\linewidth} m{0.5\linewidth}@{}}
 \toprule
 \multicolumn{1}{c}{\textbf{Parameter}} & \multicolumn{1}{c}{\textbf{Size}} \\ \midrule
-\multicolumn{1}{l}{LWE Secret Key} & \multicolumn{1}{l}{500} \\ \midrule
+\multicolumn{1}{l}{LWE Secret Key} & \multicolumn{1}{l}{Array of size 500} \\ \midrule
 \multicolumn{1}{l}{\multirow{2}{*}{Evaluation Key}} & \multicolumn{1}{l}{BootstrappingKey{[}500{]}{[}23{]}{[}2{]}} $\approx$ 1032 MBytes \\ \cmidrule(l){2-2} 
 \multicolumn{1}{l}{} & \multicolumn{1}{l}{SwitchingKey{[}1024{]}{[}25{]}{[}7{]} $\approx$ 314 MBytes} \\ \midrule
 \multicolumn{1}{l}{HomNAND Inputs} & \multicolumn{1}{l}{1-bit} \\ \midrule
@@ -201,11 +201,22 @@ As our intention is reduction of bit-width, the experiments were based on single
 From the above experiments, we conclude that of the standard datatypes, \textbf{double} is the lowest allowable precision that preserves the homomorphic encryption functionality. \newline\newline
 FFTs can also be performed in integer domain using Number Theoretic Transform library (NTL) used in \cite{helib}. NTL involves convolution of 2 sequences modulo a prime number. Hence, the choice of modulus with respect to sequence length is restricted \cite{bhattacharya2004some}. FFTW has proved to be much more optimized and faster than the latter as stated in Section 6.3, \cite{ducas2015fhew}, which is why FHEW is an improvement over HELib \cite{shai_he} which uses NTL, in terms of Bootstrapping runtime. As the optimization objective is to improve run-time, FFT function can be hand-optimized for hardware acceleration and the functional correctness verified, by integrating with the existing software implementation.
 \subsubsection*{FFT Offload}
-Various FFT implementations are explored, intuitively optimized and their runtime performance is studied using High-level synthesis tools.
-A hand-optimized non-recursive 1-D FFT using naive DFT logic has been written, integrated to the FHEW code and the functional correctness verified. This is compared with a radix-2 butterfly DIF FFT implementation and the Xilinx FFT IP Core. High-level synthesis outputs the estimated runtime and hints on improvements in performance metrics with specific optimizations. \newline\newline
-For the implementation to be synthesizable, dynamic memory allocation has been avoided and pointer attributes are deterministic at compile time. Various optimization directives have been intuitively chosen to offer improved runtime performance and the best optimization is identified. The pros and cons of all three implementations are studied to decide on which best suits our need. 
+Various FFT implementations were explored, intuitively optimized and their runtime performance was studied using High-level synthesis tools.
+Firstly, the Xilinx FFT IP Core \cite{logicore2012fast} was analyzed and its usage studied. It implements the Cooley Tukey (Radix-4 DIT) FFT and accepts input in full-precision fixed point, scaled fixed point and block floating point . Since double-precision inputs are not supported by this hard block, it is not an ideal candidate for our application's acceleration. Then, a Cooley Tukey FFT algorithm was implemented, of size N given by the product $N_1$.$N_2$ where $N_1$ naive DFTs, each of size $N_2$ were performed. 
+\begin{table}[htbp]
+\centering
+\caption{Execution time of unoptimized Cooley Tukey implementation with transform length N = 1024 in Avnet Zedboard Evaluation Platform}
+\label{tab:ct_fft_1}
+\begin{tabular}{|c|l|l|l|l|l|}
+\hline
+\textbf{N1} & 512 & 256 & 128 & 64 & 32 \\ \hline
+\textbf{N2} & 2 & 4 & 8 & 16 & 32 \\ \hline
+\textbf{Execution Time (s)} & 1.5 & 0.77 & 0.38 & 0.23 & 0.18 \\ \hline
+\end{tabular}
+\end{table}
+From Table \ref{tab:ct_fft_1}, we see that the execution time was in the order of seconds, irrespective of the values of $N_1$ and $N_2$. Thus, this implementation was further improved by doing loop and function optimizations, integrated to the FHEW code and the functional correctness was verified. Taking it further, a radix-2 butterfly DIF FFT logic was implemented. \newline \newline For these implementations to be synthesizable by the high-level synthesis tool, recursive calls and dynamic memory allocation were avoided and all pointers were made deterministic at compile time. Various optimization directives were intuitively chosen to offer improved runtime performance and the best optimization was identified. The pros and cons of all three implementations were studied to decide on which best suits our need.  
 \subsubsection{Hand-optimized non-recursive 1-D FFT}
-Table \ref{tab: dse_1dfft} illustrates the clock period, latency and utilization estimates upon applying different optimization directives to the hand-optimized FFT implementation for hardware. We observe that solution 4 offers the most optimal area-latency design point. Hence, we freeze these optimizations in our final design.
+Table \ref{tab: dse_1dfft} illustrates the clock period, latency and utilization estimates upon applying different optimization directives to the hand-optimized FFT implementation for hardware. We observe that solution 4 offers the most optimal area-latency design point. 
 \newcolumntype{L}{>{\centering\arraybackslash}p{{0.15\linewidth}}}
 \begin{table}[htbp]
 \centering
@@ -303,12 +314,14 @@ Appendix \ref{fhewcode3:CTfft} shows that some loop bounds are not statically de
 \centering
 \caption{Comparison of execution time in different FFT algorithms}
 \label{tab:compare_fft}
-\begin{tabular}{|m{4.5cm}|C|C|C|}
+\begin{tabular}{|m{0.2\linewidth}|m{0.4\linewidth}|m{0.35\linewidth}|}
 \hline
-\multicolumn{1}{|l|}{\textbf{\textbf{\begin{tabular}[c]{@{}c@{}}Execution Time = \\ No. of cycles x\\Clock period\end{tabular}}}} & \textbf{Non-recursive 1-D FFT} & \textbf{Cooley Tukey Radix-2 DIF FFT} & \textbf{Xilinx FFT IP Core (Radix-4 DIT FFT)} \\ \hline
-\textbf{Best-case} & 5387290 x 11.96 ns = 0.064 s & 1210 x 8.23 ns = 9.95 $\mu$s & 0.31 $\mu$s \\ \hline
-\textbf{Worst-case} & 5387290 x 11.96 ns = 0.064 s & 49871994 x 8.23 ns = 0.41 s & 0.31 $\mu$s \\ \hline
+ & \textbf{Non-recursive 1-D FFT} & \textbf{Radix-2 DIF FFT} \\ \hline
+\textbf{Execution Time} & 5387290 x 11.96 ns = 0.064 s & 1210 x 8.23 ns = 9.95 $\mu$s \\ \hline
 \end{tabular}
 \end{table}
-In Table \ref{tab:compare_fft}, we compare the performances of the two FFT implementations and the hard IP Core block provided by Xilinx. Studying the example usage of IP core, it is seen that the input is fed to the core in hexadecimal format and the supported arithmetic formats for inputs are full-precision fixed point, scaled fixed point and block floating point \cite{logicore2012fast}. Since double-precision inputs are not supported by this hard block, it is not an ideal candidate for our application's acceleration. In Non-recursive 1-D FFT, execution time is of the order of a few milliseconds. As our application demands speed in the range of microseconds for gain over software implementation, Radix-2 FFT proves to be the optimal choice.
-
+The execution time in Table \ref{tab:compare_fft} is calculated as the product of number of cycles and clock period. In Non-recursive 1-D FFT, execution time is of the order of a few milliseconds. As our application demands speed in the range of microseconds for gain over software implementation, Radix-2 FFT proves to be the optimal choice. \newline
+\begin{adjustwidth}{2cm}{}
+The ratio $R_{acceleration}$ = $\frac{t_{sw}}{t_{hw}}$ = $\frac{30.892}{9.95}$ = 3.1047\newline 
+\end{adjustwidth} 
+High-speed Streaming DMA Transfers from high performance ports of Zynq Processing system to Programmable logic via AXI Interface assure that the communication overhead is less. By using higher FPGA generations such as Virtex 7, a much higher speedup can be obtained and unroll factor increased. 

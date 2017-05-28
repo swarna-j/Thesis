@@ -299,7 +299,7 @@ $ ./lenet_app -m test -f ../imgs/mnist_test_img_list.csv -d ../imgs/mnist-testse
 \end{scriptsize}
 The .csv image list file contains all MNIST handwritten images sized 28x28, along with their labels. These labels help calculate the prediction accuracy and error probability of the digit classifier.\newline
 \textbf{Acceleration Hot-spots} \newline 
-In order to identify the acceleration hot-spots, each operation of the ConvNet was profiled and the results were observed as illustrated in Table \ref{table:sw_hotspots}. The API \textit{\textbf{PAPI\_get\_virt\_usec()}} is used to get the timestamp in microseconds. To use this API, header file "papi.h" has to be included in the source file.
+In order to identify the acceleration hot-spots, each operation of the ConvNet was profiled and the results were observed as illustrated in Table \ref{table:sw_hotspots}. The total application runtime (execution of all 8 layers) is around 77269 $\mu$s = 0.077 seconds. The API \textit{\textbf{PAPI\_get\_virt\_usec()}} is used to get the timestamp in microseconds. To use this API, header file "papi.h" has to be included in the source file.
 \begin{table}[htbp]
 \caption{Analysis of Application Hot-spots for Acceleration}
 \centering
@@ -670,3 +670,7 @@ Softmax &\makecell[c]{0.014} &\makecell[c]{0.012} \\
 \end{tabular}
 \label{table:results_compare_cnn}
 \end{table}
+
+\textbf{Goal:} The ratio $R_{acceleration}$ = $\frac{t_{sw}}{t_{hw}} \>$ 1\newline \newline
+Device 1: $R_{acceleration}$ = $\frac{0.077}{1.30224 \times 10^{-3}}$ = 59.12\newline \newline
+Device 2: $R_{acceleration}$ = $\frac{0.077}{16.09 \times 10^{-3}}$ = 4.78
