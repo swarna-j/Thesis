@@ -25,7 +25,7 @@ The network is trained using Caffe and the model is stored as C file
 using namespace cv;
 using namespace std;
 
-unsigned long long t1, t2;
+unsigned long long t1, t2,t3,t4,t5,t6,t7,t8,t9;
 
 // Structure defs to store the layer weights and bias
 typedef struct ConvWtBias {
@@ -320,29 +320,43 @@ int lenet5App(Mat &input, const ConvLayers &convModel, const FcLayers &fcModel) 
 	t1 = PAPI_get_virt_usec();
 	// conv layer 1
 	convLayer(inVec, conv1Out, convModel.layerParams[0]);
+	t2 = PAPI_get_virt_usec();	
 	// pool layer 1
 	maxPoolLayer(conv1Out, pool1Out, 2, 2);
+	t3 = PAPI_get_virt_usec();
 	// conv layer 2
 	convLayer(pool1Out, conv2Out, convModel.layerParams[1]);
+	t4 = PAPI_get_virt_usec();
 	// pool layer 2
 	maxPoolLayer(conv2Out, pool2Out, 2, 2);
+	t5 = PAPI_get_virt_usec();
 	// inner product 1
 	innerProductLayer(pool2Out, ip1Out, fcModel.layerParams[0]);
+	t6 = PAPI_get_virt_usec();
 	// ReLU layer
 	reluLayer(ip1Out);
+	t7 = PAPI_get_virt_usec();
 	// inner product 2
 	innerProductLayer(ip1Out, ip2Out, fcModel.layerParams[1]);
+	t8 = PAPI_get_virt_usec();
 
 	softmaxLayer(ip2Out, prob);
 
-	t2 = PAPI_get_virt_usec();
+	t9 = PAPI_get_virt_usec();
 
 	cout << "-----------Output probabilities--------" << endl;
 	for(int p = 0; p < prob.size(); p++) {
 		cout << prob[p] << ",  ";
 	}
 	cout << endl << endl;
-	
+	cout<<"Convolution Layer 1:"<<t2-t1<<"usec"<<endl;
+	cout<<"Maxpool Layer 1:"<<t3-t2<<"usec"<<endl;
+	cout<<"Convolution Layer 2:"<<t4-t3<<"usec"<<endl;
+	cout<<"Maxpool Layer 2:"<<t5-t4<<"usec"<<endl;
+	cout<<"Inner Product Layer 1:"<<t6-t5<<"usec"<<endl;
+	cout<<"ReLU Layer 1:"<<t7-t6<<"usec"<<endl;
+	cout<<"Inner Product Layer 2:"<<t8-t7<<"usec"<<endl;
+	cout<<"Softmax Layer:"<<t9-t8<<"usec"<<endl;
 	return distance(prob.begin(), max_element(prob.begin(), prob.end()));
 
 	
