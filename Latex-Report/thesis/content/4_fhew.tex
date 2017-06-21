@@ -226,7 +226,7 @@ Table \ref{tab: dse_1dfft} illustrates the clock period, latency and utilization
 \hline
 \multicolumn{7}{|c|}{\textbf{Target: Avnet Zedboard Evaluation xc7z020clg484-1}} \\ \hline
 \multicolumn{2}{|l|}{} & \textbf{Solution 1} & \textbf{Solution 2} & \textbf{Solution 3} & \textbf{Solution 4} & \textbf{Solution 5} \\ \hline
-\multicolumn{2}{|c|}{\textbf{Optimization}} & No directives. & Loop 0: Pipeline& Loop 0: Unroll & Loop 2: Pipeline & Loop 2: Unroll \\ \hline
+\multicolumn{2}{|c|}{\textbf{Optimization}} & No directives. & Loop 0: Pipeline& Loop 0: Unroll & Loop 0 \& 2: Pipeline & Loop 0: Pipeline, Loop 2: Unroll \\ \hline
 \multicolumn{2}{|c|}{\textbf{\begin{tabular}[c]{@{}c@{}}Estimated\\Clock Period\\(ns)\end{tabular}}} & 9.83 & 9.83 & 12.93 & 11.96 & 12.19 \\ \hline
 \multirow{2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Latency\\ (cycles)\end{tabular}}} & \textbf{Min} & 295730178 & 295705626 & 297810991 & 5387290 & 8048665 \\ \cline{2-7} 
  & \textbf{Max} & 945847298 & 945822746 & 947928111 & 5387290 & 12492825 \\ \hline
@@ -234,7 +234,6 @@ Table \ref{tab: dse_1dfft} illustrates the clock period, latency and utilization
  & \textbf{DSP48E} & 67 & 73 & 234 & 105 & 31410 \\ \cline{2-7} 
  & \textbf{FF} & 7235 & 8245 & 149093 & 32308 & 4632256 \\ \cline{2-7} 
  & \textbf{LUT} & 24133 & 26896 & 117748 & 70551 & 19331620 \\ \hline
-\multicolumn{2}{|c|}{\textbf{\begin{tabular}[c]{@{}c@{}}Total Number \\ of Resources\end{tabular}}} & 31448 & 35227 & 267088 & 102972 & 24008520 \\ \hline
 \end{tabular}
 \end{table}
 
@@ -252,13 +251,82 @@ Table \ref{tab: dse_1dfft} illustrates the clock period, latency and utilization
      meta index=2 % the meta data is found in the third column
      ] {
    x          y     label
-620788738    31448    1
-620764186    35227    2
-622869551   267088    3
+945847298    31448    1
+945822746    35227    2
+947928111   267088    3
 5387290     102972    4
-10270745  24008520    5
+12492825  24008520    5
 	};
 	\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\begin{axis}[
+    title={Resource Utilization with different optimization directives},
+    xlabel={Resource Type},
+    ylabel={Number of Resources},
+    xtick=data,    
+    legend pos=north west,
+    ymajorgrids=true,
+    grid style=dashed, 
+    symbolic x coords={BRAM, DSP48E, LUT, FF},
+]
+ 
+\addplot[
+    mark=*, mark options={fill=white}, color = red
+    ]
+    coordinates {
+    (BRAM,13)
+    (DSP48E,67)
+    (LUT,24133)
+    (FF,7235)
+    };   
+
+\addplot[
+    mark=triangle*, mark options={fill=white}, color = green
+    ]
+    coordinates {
+    (BRAM,13)
+    (DSP48E,73)
+    (LUT,26896)
+    (FF,8245)
+    };    
+    
+\addplot[
+    mark=square*, mark options={fill=white}, color = blue
+    ]
+    coordinates {
+    (BRAM,13)
+    (DSP48E,234)
+    (LUT,117748)
+    (FF,149093)
+    };    
+    
+\addplot[
+    mark=square*, mark options={fill=brown}, color = brown
+    ]
+    coordinates {
+    (BRAM,8)
+    (DSP48E,105)
+    (LUT,70551)
+    (FF,32308)
+    };    
+\end{axis}    
+    \begin{scope}[shift={(1,3)}] 
+	\draw (0,0) -- 
+		plot[mark=*, mark options={fill=white}, color=red] (0.25,0) -- (0.5,0) 
+		node[right]{Solution 1};
+	\draw[yshift=\baselineskip] (0,0) -- 
+		plot[mark=triangle*, mark options={fill=white}, color=green] (0.25,0) -- (0.5,0)
+		node[right]{Solution 2};
+	\draw[yshift=2\baselineskip] (0,0) -- 
+		plot[mark=square*, mark options={fill=white}, color=blue] (0.25,0) -- (0.5,0)
+		node[right]{Solution 3};
+	\draw[yshift=3\baselineskip] (0,0) -- 
+		plot[mark=square*, mark options={fill=brown}, color = brown] (0.25,0) -- (0.5,0)
+		node[right]{Solution 4};
+	\end{scope}
+
 \end{tikzpicture}
 
 \subsubsection{Cooley Tuckey Radix-2 DIF FFT}
@@ -281,9 +349,77 @@ Appendix \ref{fhewcode3:CTfft} shows that some loop bounds are not statically de
  & \textbf{DSP48E} & 56 & 56 & 56 & 56 \\ \cline{2-6} 
  & \textbf{FF} & 4511 & 4513 & 131834 & 6996 \\ \cline{2-6} 
  & \textbf{LUT} & 8529 & 8529 & 67506 & 9932 \\ \hline
-\multicolumn{2}{|c|}{\textbf{\begin{tabular}[c]{@{}c@{}}Total Number \\ of Resources\end{tabular}}} & 13096 & 13098 & 199396 & 16984 \\ \hline
 \end{tabular}
 \end{table}
+
+\begin{tikzpicture}
+\begin{axis}[
+    title={Resource Utilization with different optimization directives},
+    xlabel={Resource Type},
+    ylabel={Number of Resources},
+    xtick=data,    
+    legend pos=north west,
+    ymajorgrids=true,
+    grid style=dashed, 
+    symbolic x coords={BRAM, DSP48E, LUT, FF},
+]
+ 
+\addplot[
+    mark=*, mark options={fill=white}, color = red
+    ]
+    coordinates {
+    (BRAM,0)
+    (DSP48E,56)
+    (LUT,8529)
+    (FF,4511)
+    };   
+
+\addplot[
+    mark=triangle*, mark options={fill=white}, color = green
+    ]
+    coordinates {
+    (BRAM,0)
+    (DSP48E,56)
+    (LUT,8529)
+    (FF,4513)
+    };    
+    
+\addplot[
+    mark=square*, mark options={fill=white}, color = blue
+    ]
+    coordinates {
+    (BRAM,0)
+    (DSP48E,56)
+    (LUT,67506)
+    (FF,131834)
+    };    
+    
+\addplot[
+    mark=square*, mark options={fill=brown}, color = brown
+    ]
+    coordinates {
+    (BRAM,0)
+    (DSP48E,56)
+    (LUT,9932)
+    (FF,6996)
+    };    
+\end{axis}    
+    \begin{scope}[shift={(1,3)}] 
+	\draw (0,0) -- 
+		plot[mark=*, mark options={fill=white}, color=red] (0.25,0) -- (0.5,0) 
+		node[right]{Solution 1};
+	\draw[yshift=\baselineskip] (0,0) -- 
+		plot[mark=triangle*, mark options={fill=white}, color=green] (0.25,0) -- (0.5,0)
+		node[right]{Solution 2};
+	\draw[yshift=2\baselineskip] (0,0) -- 
+		plot[mark=square*, mark options={fill=white}, color=blue] (0.25,0) -- (0.5,0)
+		node[right]{Solution 3};
+	\draw[yshift=3\baselineskip] (0,0) -- 
+		plot[mark=square*, mark options={fill=brown}, color = brown] (0.25,0) -- (0.5,0)
+		node[right]{Solution 4};
+	\end{scope}
+
+\end{tikzpicture}
 
 \begin{tikzpicture}
 \label{graph:dse_CTfft}
@@ -308,18 +444,40 @@ Appendix \ref{fhewcode3:CTfft} shows that some loop bounds are not statically de
 \end{tikzpicture}
 \newline From the plot \ref{graph:dse_CTfft}, we see that solution 3 gives the best case latency. However, there are not enough LUTs in the target board to implement this design. Hence, optimizations of solution 4 are more appropriate for a practical best-case latency scenario. 
 \newcolumntype{C}{>{\centering\arraybackslash}p{{0.25\linewidth}}}
-\subsubsection{Comparison of Execution Times}
-
+\subsubsection{MachSuite FFT}
+MachSuite is a collection of 19 diverse application benchmarks, which are high-level synthesizable. FFT algorithm which is one of the benchmark applications is explored to decide whether it meets our requirement.
 \begin{table}[htbp]
 \centering
-\caption{Comparison of execution time in different FFT algorithms}
-\label{tab:compare_fft}
-\begin{tabular}{|m{0.2\linewidth}|m{0.4\linewidth}|m{0.35\linewidth}|}
+\caption{Design Space Exploration for Machsuite FFT}
+\label{tab:dse_machsuite}
+\begin{tabular}{|m{2cm}|m{1.5cm}|m{3cm}|m{3cm}|}
 \hline
- & \textbf{Non-recursive 1-D FFT} & \textbf{Radix-2 DIF FFT} \\ \hline
-\textbf{Execution Time} & 5387290 x 11.96 ns = 0.064 s & 1210 x 8.23 ns = 9.95 $\mu$s \\ \hline
+\multicolumn{4}{|c|}{\textbf{Target: Avnet Zedboard Evaluation xc7z020clg484-1}} \\ \hline
+\multicolumn{2}{|c|}{} & \textbf{Solution 1} & \textbf{Solution 2}\\ 
+\hline
+\multicolumn{2}{|c|}{\textbf{Optimization}} & \begin{tabular}[c]{@{}c@{}}Loop 0: Trip\\Count = 10,\\Loop 1: Trip\\Count = 1024\end{tabular} & \begin{tabular}[c]{@{}c@{}}Loops 1,2:\\Trip Count=512,\\Loop 3:\\Pipeline\end{tabular} \\ \hline
+\multicolumn{2}{|c|}{\textbf{Estimated Clock Period}} & \makecell[c]{8.23} & \makecell[c]{8.23} \\ \hline
+\multirow{2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Latency\\ (cycles)\end{tabular}}} & \textbf{Min} & \makecell[c]{2170} & \makecell[c]{3195} \\ \cline{2-4} 
+ & \textbf{Max} & \makecell[c]{49871994} & \makecell[c]{49871995} \\ \hline
+\multirow{4}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Utilization\\ Estimates\end{tabular}}} & \textbf{BRAM\_18K} & \makecell[c]{0} & \makecell[c]{0} \\ \cline{2-4} 
+ & \textbf{DSP48E} & \makecell[c]{56} & \makecell[c]{56} \\ \cline{2-4} 
+ & \textbf{FF} & \makecell[c]{4511} & \makecell[c]{4513} \\ \cline{2-4} 
+ & \textbf{LUT} & \makecell[c]{8529} & \makecell[c]{8529} \\ \hline
 \end{tabular}
 \end{table}
+
+\subsubsection{Comparison of Execution Times}
+\begin{table}[htbp]
+\centering
+\caption{Estimates of execution time in different FFT algorithms}
+\label{tab:compare_fft}
+\begin{tabular}{|m{0.2\linewidth}|m{0.25\linewidth}|m{0.25\linewidth}|m{0.25\linewidth}|}
+\hline
+ & \textbf{\makecell[c]{Non-recursive\\1-D FFT}} & \textbf{\makecell[c]{Radix-2\\DIF FFT}} &\textbf{MachSuite FFT}\\ \hline
+\textbf{Best-case Execution Time} & 5387290 x 11.96 ns = 0.064 s & 1210 x 8.23 ns = 9.95 $\mu$s & 2170 X 8.23 ns = 17 $\mu$s \\ \hline
+\end{tabular}
+\end{table}
+
 The execution time in Table \ref{tab:compare_fft} is calculated as the product of number of cycles and clock period. In Non-recursive 1-D FFT, execution time is of the order of a few milliseconds. As our application demands speed in the range of microseconds for gain over software implementation, Radix-2 FFT proves to be the optimal choice. \newline
 \begin{adjustwidth}{2cm}{}
 The ratio $R_{acceleration}$ = $\frac{t_{sw}}{t_{hw}}$ = $\frac{30.892}{9.95}$ = 3.1047\newline 

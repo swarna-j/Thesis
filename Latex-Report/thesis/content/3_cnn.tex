@@ -300,28 +300,31 @@ $ ./lenet_app -m test -f ../imgs/mnist_test_img_list.csv -d ../imgs/mnist-testse
 The .csv image list file contains all MNIST handwritten images sized 28x28, along with their labels. These labels help calculate the prediction accuracy and error probability of the digit classifier.\newline
 \textbf{Acceleration Hot-spots} \newline 
 In order to identify the acceleration hot-spots, each operation of the ConvNet was profiled and the results were observed as illustrated in Table \ref{table:sw_hotspots}. The total application runtime (execution of all 8 layers) is around 77269 $\mu$s = 0.077 seconds. The API \textit{\textbf{PAPI\_get\_virt\_usec()}} is used to get the timestamp in microseconds. To use this API, header file "papi.h" has to be included in the source file.
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 \begin{table}[htbp]
-\caption{Analysis of Application Hot-spots for Acceleration}
+\caption{Analysis of Application Hot-spots for Acceleration \cite{notchenko2016sparse}}
 \centering
-\begin{tabular}{l c}
+\begin{tabular}{@{}m{0.21\linewidth} m{0.21\linewidth}*{2}{L{\dimexpr0.22\linewidth-2\tabcolsep\relax}}@{}}
 \toprule
-\textbf{Layers }& \textbf{Computation Time ($\mu$s)}\\
+& & \multicolumn{2}{c}{Execution Time (ms)} \\
+\cmidrule(r{2pt}){3-4} Layers &Computational Complexity& Intel Core i3-2350M CPU @ 2.30GHz & ZedBoard CPU (2 ARM Cortex A9 Cores)\\
 \midrule
-Convolution 1 &12308\\
+Convolution 1 & 392000 &12.308&66.577\\
 \midrule
-MaxPool 1 &3382\\
+MaxPool 1&2880&3.382&14.248\\
 \midrule
-Convolution 2 &48164\\
+Convolution 2 &3600000 &48.164&359.519\\
 \midrule
-MaxPool 2 &559\\
+MaxPool 2&800&0.559&4.166\\
 \midrule
-Inner Product 1 &5522\\
+Inner Product 1&1601&5.522&47.924\\
 \midrule
-ReLU&12\\
+ReLU&500&0.012&0.073\\
 \midrule
-Inner Product 2 &73\\
+Inner Product 2&1001&0.073&0.609\\
 \midrule
-Softmax&9\\
+Softmax&20&0.009&0.110\\
 \bottomrule
 \end{tabular}
 \label{table:sw_hotspots}
@@ -632,45 +635,84 @@ printf("Kernel Execution Time is: %0.3f \n",total_time/1000000.0);
 \end{minipage}
 \end{itemize}
 \subsection{Comparative Study of Results}
+A simple device query program is run on each of the test devices to query attributes such as memory, number of compute units, etc. The test device specifications are tabulated for comparison in Table \ref{table:dev_query}. 
 \label{3_1_4}
-\textbf{Test Devices}
-\begin{enumerate}
-\item \textbf{Intel OpenCL} from Intel(R) Corporation \\
-OpenCL Version: OpenCL 1.2 LINUX\\
-Compute Units: 4
-\item \textbf{NVIDIA CUDA} from NVIDIA Corporation\\ 
-OpenCL Version: OpenCL 1.1 CUDA 4.2.1\\
-Compute Units:2
-\end{enumerate}
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\begin{table}[htbp]
+\caption{Test Device Specifications}
+\centering
+\begin{tabular}{@{}p{0.25\linewidth}*{4}{L{\dimexpr0.15\linewidth-1\tabcolsep\relax}}@{}}
+\toprule
+& \multicolumn{4}{c}{Test Devices} \\
+\cmidrule(r{4pt}){2-5}Attributes & Intel Core i3-2350M CPU & NVIDIA GeForce 315M & Intel Xeon CPU E5-1650 & NVIDIA Quadro 600\\
+\midrule
+OpenCL Version & \makecell[c]{1.2} & \makecell[c]{1.1} & \makecell[c]{2.1} & \makecell[c]{1.1}\\
+\midrule
+Compute Units &\makecell[c]{4} &\makecell[c]{2} & \makecell[c]{12} & \makecell[c]{2}\\
+\midrule
+\makecell[l]{Clock\\Frequency (MHz)} &\makecell[c]{2300} &\makecell[c]{1468} & \makecell[c]{3200} & \makecell[c]{1280}\\
+\midrule
+\makecell[l]{Global Memory\\(MB)} &\makecell[c]{7967} &\makecell[c]{511} & \makecell[c]{15971} & \makecell[c]{1023}\\
+\midrule
+\makecell[l]{Maximum\\Allocateable\\ Memory (MB)}&\makecell[c]{1992} &\makecell[c]{128} & \makecell[c]{3993} & \makecell[c]{256}\\
+\midrule
+\makecell[l]{Local Memory\\(KB)} &\makecell[c]{32768} &\makecell[c]{16384} & \makecell[c]{32768} & \makecell[c]{49152}\\
+\bottomrule
+\end{tabular}
+\label{table:dev_query}
+\end{table}
+
 \begin{table}[htbp]
 \caption{Comparison of kernel runtime in various OpenCL Devices}
 \centering
-\begin{tabular}{@{}p{0.25\textwidth}*{2}{L{\dimexpr0.22\textwidth-2\tabcolsep\relax}}@{}}
+\begin{tabular}{@{}p{0.21\linewidth}*{4}{L{\dimexpr0.15\linewidth-1\tabcolsep\relax}}@{}}
 \toprule
-& \multicolumn{2}{c}{Kernel Execution Time (ms)} \\
-\cmidrule(r{4pt}){2-3} & Intel Core i3-2350M CPU @ 2.30GHz (4 CUs) & NVIDIA GeForce 315M (2 CUs)\\
+& \multicolumn{4}{c}{Kernel Execution Time (ms)} \\
+\cmidrule(r{4pt}){2-5} & Intel Core i3-2350M CPU & NVIDIA GeForce 315M & Intel Xeon CPU E5-1650 & NVIDIA Quadro 600\\
 \midrule
-Convolution 1 & \makecell[c]{0.216} & \makecell[c]{0.707}\\
+Convolution 1 & \makecell[c]{0.216} & \makecell[c]{0.707} & \makecell[c]{0.088} & \makecell[c]{0.143}\\
 \midrule
-MaxPool 1 &\makecell[c]{0.046} &\makecell[c]{0.166} \\
+MaxPool 1 &\makecell[c]{0.046} &\makecell[c]{0.166} & \makecell[c]{0.022} & \makecell[c]{0.029}\\
 \midrule
-Convolution 2 &\makecell[c]{0.716} &\makecell[c]{11.332} \\
+Convolution 2 &\makecell[c]{0.716} &\makecell[c]{11.332} & \makecell[c]{0.146} & \makecell[c]{1.846}\\
 \midrule
-Maxpool 2 &\makecell[c]{0.026} &\makecell[c]{0.371} \\
+Maxpool 2 &\makecell[c]{0.026} &\makecell[c]{0.371} & \makecell[c]{0.014} & \makecell[c]{0.026}\\
 \midrule
-Inner Product 1&\makecell[c]{0.187} &\makecell[c]{1.651} \\
+Inner Product 1&\makecell[c]{0.187} &\makecell[c]{1.651} & \makecell[c]{0.039} & \makecell[c]{1.747}\\
 \midrule
-ReLU &\makecell[c]{0.011} &\makecell[c]{0.012} \\
+ReLU &\makecell[c]{0.011} &\makecell[c]{0.012} & \makecell[c]{0.007} & \makecell[c]{0.005}\\
 \midrule
-Inner Product 2&\makecell[c]{0.010} &\makecell[c]{0.287} \\
+Inner Product 2&\makecell[c]{0.010} &\makecell[c]{0.287} & \makecell[c]{0.006} & \makecell[c]{0.109}\\
 \midrule
-Softmax &\makecell[c]{0.014} &\makecell[c]{0.012} \\
+Softmax &\makecell[c]{0.014} &\makecell[c]{0.012} & \makecell[c]{0.008}& \makecell[c]{0.007}\\
 \bottomrule
 \end{tabular}
 \label{table:results_compare_cnn}
 \end{table}
 
-\textbf{Goal:} The ratio $R_{acceleration}$ = $\frac{t_{sw}}{t_{hw}} \>$ 1\newline \newline
-Device 1: $R_{acceleration}$ = $\frac{0.077}{1.30224 \times 10^{-3}}$ = 59.12\newline \newline
-Device 2: $R_{acceleration}$ = $\frac{0.077}{16.09 \times 10^{-3}}$ = 4.78
+\textbf{Goal:} Achieve a faster runtime in hardware compared to software.
+The ratio $R_{acceleration}$ = $\frac{t_{sw}}{t_{hw}} \textgreater $ 1\newline 
+\begin{tikzpicture}
+  \begin{axis}[xbar,
+    y axis line style = { opacity = 0 },
+    axis x line       = none,
+    tickwidth         = 0pt,
+    enlarge y limits  = 0.25,
+    enlarge x limits  = 0.02,
+    symbolic y coords = {Intel Core i3-2350M, NVIDIA GeForce 315M, Intel Xeon E5-1650 CPU, NVIDIA Quadro 600},
+    nodes near coords,
+  ]
+  \addplot coordinates { 
+  (62.8,Intel Core i3-2350M)         
+  (5.29,NVIDIA GeForce 315M)                       
+  (233.3,Intel Xeon E5-1650 CPU)
+  (19.683,NVIDIA Quadro 600)
+  };
+  \legend{$R_{acceleration}$}
+  \end{axis}
+  % title
+\node[align=center,font=\bfseries](title) at (current bounding box.north)
+{Hardware Speedup (Reference: Table \ref{table:results_compare_cnn})};
+\end{tikzpicture}
+
+We observe that with more memory to work on and more compute units, more threads can be concurrently executed and hence, more speedup can be achieved. 
