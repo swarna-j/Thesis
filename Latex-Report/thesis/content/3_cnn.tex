@@ -310,26 +310,59 @@ In order to identify the acceleration hot-spots, each operation of the ConvNet w
 & & \multicolumn{2}{c}{Execution Time (ms)} \\
 \cmidrule(r{2pt}){3-4} Layers &Computational Complexity& Intel Core i3-2350M CPU @ 2.30GHz & ZedBoard CPU (2 ARM Cortex A9 Cores)\\
 \midrule
-Convolution 1 & 392000 &12.308&66.577\\
+Convolution 1 & 300020 &12.308&66.577\\
 \midrule
 MaxPool 1&2880&3.382&14.248\\
 \midrule
-Convolution 2 &3600000 &48.164&359.519\\
+Convolution 2 &1689000 &48.164&359.519\\
 \midrule
 MaxPool 2&800&0.559&4.166\\
 \midrule
-Inner Product 1&1601&5.522&47.924\\
+Inner Product 1&400500&5.522&47.924\\
 \midrule
 ReLU&500&0.012&0.073\\
 \midrule
-Inner Product 2&1001&0.073&0.609\\
+Inner Product 2&5010&0.073&0.609\\
 \midrule
 Softmax&20&0.009&0.110\\
 \bottomrule
 \end{tabular}
 \label{table:sw_hotspots}
 \end{table}
-The convolution layer involves about 86\% ((12308+48164)/70029) of the required arithmetic operations in the ConvNet framework. Following this, the fully connected layers are the next most resource-intensive layers. 
+
+In Table \ref{table:hyperparams}, the output volume of each Layer of ConvNet is computed based on the concepts discussed in Section 3.1.1.1, given the input dimensions and hyperparameters. Each layer is studied carefully to gather the computational demand of the application. \newline \newline
+For example, in the first convolution layer, filtering operation requires 288K (24 $\times$ 24 $\times$ 5 $\times$ 5 $\times$ 1 $\times$ 20) MAC operations. Feature map accumulation along the depth dimension demands another 500 (20 $\times$ 1 $\times$ 5 $\times$ 5) accumulation operations. Addition of bias to each filter output involves 11520 (20 $\times$ 1 $\times$ 24 $\times$ 24) accumulation operations. Hence, the total computational demand of the first convolution layer is estimated to be around 300K MAC operations. \newline \newline
+In the MaxPool layer, the maximum value is identified in each pooling window region spanning to 2 $\times$ 2. Hence, 20 channels of 24 $\times$ 24 inputs demand a total of 20 $\times$ 12 $\times$ 12 = 2880 findMax operations in the first Maxpool layer.  The Inner Product Layer’s computational demand is dictated by the input-output dimensions. Hence, the first IP Layer involves 400K MAC operations (500 $\times$ 800) and 500 accumulations for addition of filter bias. Complexity of the ReLU and Softmax layers are dependent on the input size. \newline \newline
+The convolution layer involves about 83\% of the required arithmetic operations in the ConvNet framework. Following this, the fully connected layers are the next most resource-intensive layers. \newline \newline
+Table \ref{table:sw_hotspots} illustrates the computational complexity of all layers in the Lenet-5 ConvNet (Figure \ref{fig:Lenet-5-MNIST}) and their execution time in Intel Core i3-2350M CPU and Zedboard processing system containing 2 ARM Cortex A9 Cores.\newline \newline
+We observe from the table that for the first convolution layer, the execution time in Intel Core i3 CPU is 12.308 ms for 300,020 MAC operations. Hence, we infer that one MAC operation takes around $\frac{12.308 ms}{300020}$ = 41 ns.  Similarly, one MAC operation in Zedboard is estimated to be $\frac{66.577 ms}{300020}$ = 221.9 ns. \newline \newline
+Using these estimates, we assess the number of MAC operations per second as follows:
+\begin{enumerate}
+\item Intel Core i3-2350M:  $\frac{1}{41 ns}$ = 24,390,243.9 $\approx$ 24M MACs/second
+\item Zedboard CPU:  $\frac{1}{221.9 ns}$ = 4,506,534.475 $\approx$ 4M MACs/second
+\end{enumerate}
+In the software implementation, the input image is loaded from external memory. Hence, loading image from external memory and storing intermediate results and output in the external memory can create a lot of overhead. Typically, this data movement overhead is overcome by storing the images on-chip, avoiding unnecessary load-stores in external memory. Doing so, we can heavily accelerate the convolution and inner product layers, achieving a greater speed-up.
+Consider a hypothetical platform with 20 RISC processors, each capable of performing 1 MAC every cycle and running at 100 MHz.
+\begin{itemize}
+\item Time period of 1 cycle = $\frac{1}{100 MHz}$ = 10 ns
+\item Number of MACs computed by 20 RISC processors in one cycle = 20
+\item Number of cycles required to compute 300020 MACs in Convolution Layer 1 by 20 RISC processors = 15001 Cycles
+\item Time taken by 20 RISC processors to compute 300020 MACs in Convolution Layer 1 = 15001 $\times$ 10 ns =  150 us
+\end{itemize}
+
+\subsubsection*{Speedup:}
+\begin{enumerate}
+\item Intel Core i3-2350M: $\frac{12.308 ms}{150 \mu s}$ = 82.05
+\item Zedboard CPU: $\frac{66.577 ms}{150 \mu s}$ = 443.84
+\end{enumerate}		
+The hypothetical platform is approximately 82 times faster than the Zedboard ARM and 440 times faster than Intel platform under test.\\
+Doing a similar analysis for \textbf{convolution layer 2}: \\
+Each 12 $\times$ 12 input image involves 1689 MACs (Filtering: (8 $\times$ 8 $\times$ 5 $\times$ 5) + Feature Map Accumulation: (5 $\times$ 5) + Bias Addition: (8 $\times$ 8)). 
+\begin{itemize}
+\item Number of cycles required to compute 1689000 MACs in Convolution Layer 2 by 20 RISC processors = 84450 Cycles
+\item Time taken by 20 RISC processors to compute 1689000 MACs in Convolution Layer 2 = 84450 $\times$ 10 ns =  844.5 us
+\end{itemize}
+With our hypothetical platform, the time taken for getting all outputs of Convolution Layer 2 is 57 times faster than Intel platform and 426 times faster than Zedboard ARM. 
 \subsubsection{Improvements}
 \label{3_1_2_3}
 One approach to minimizing data transfer to off-chip memory is by using reduced bit-width fixed point numbers, realizable by using open-source fixed point arithmetic libraries like LibFi \cite{LibFi}. This approach is very straightforward and promises speedup, reduced area and consequently reduced energy consumption. However, the specifics of this approach are beyond the scope of this thesis. \newline \newline
@@ -714,5 +747,11 @@ The ratio $R_{acceleration}$ = $\frac{t_{sw}}{t_{hw}} \textgreater $ 1\newline
 \node[align=center,font=\bfseries](title) at (current bounding box.north)
 {Hardware Speedup (Reference: Table \ref{table:results_compare_cnn})};
 \end{tikzpicture}
-
+The total time required to classify one input image is 1.21ms in Intel Core i3-2350M, 14.526ms in NVIDIA GeForce 315M, 3.905ms in NVIDIA Quadro 600 and 322 us in Intel Xeon platform. This implies that in one second, the number of images that can be processed by each of these heterogeneous platforms is given by:
+\begin{enumerate}
+\item Intel Core i3-2350M:  $\frac{1}{1.21ms} \approx$ 826 frames/second
+\item NVIDIA GeForce 315M:  $\frac{1}{14.526ms} \approx$ 68 frames/second
+\item Intel Xeon CPU E5-1650: $\frac{1}{0.322ms} \approx$ 3105 frames/second
+\item NVIDIA Quadro 600: $\frac{1}{3.905ms} \approx$ 256 frames/second
+\end{enumerate}
 We observe that with more memory to work on and more compute units, more threads can be concurrently executed and hence, more speedup can be achieved. 
