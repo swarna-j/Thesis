@@ -1,0 +1,18 @@
+0.6
+2016.4
+Dec 14 2016
+22:45:39
+/home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/AESL_automem_img.v,1497269769,systemVerilog,,,,AESL_automem_img,/home/jsk_027/Vivado/2016.4/data/xsim/ip/xsim_ip.ini,ieee_proposed=./ieee_proposed,,,,,,
+/home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/AESL_automem_img_twid.v,1497269769,systemVerilog,,,,AESL_automem_img_twid,/home/jsk_027/Vivado/2016.4/data/xsim/ip/xsim_ip.ini,ieee_proposed=./ieee_proposed,,,,,,
+/home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/AESL_automem_real_r.v,1497269769,systemVerilog,,,,AESL_automem_real_r,/home/jsk_027/Vivado/2016.4/data/xsim/ip/xsim_ip.ini,ieee_proposed=./ieee_proposed,,,,,,
+/home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/AESL_automem_real_twid.v,1497269769,systemVerilog,,,,AESL_automem_real_twid,/home/jsk_027/Vivado/2016.4/data/xsim/ip/xsim_ip.ini,ieee_proposed=./ieee_proposed,,,,,,
+/home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/fft.autotb.v,1497269769,systemVerilog,,,,apatb_fft_top,/home/jsk_027/Vivado/2016.4/data/xsim/ip/xsim_ip.ini,ieee_proposed=./ieee_proposed,,,,,,
+/home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/fft.v,1497269726,systemVerilog,,,,fft,/home/jsk_027/Vivado/2016.4/data/xsim/ip/xsim_ip.ini,ieee_proposed=./ieee_proposed,,,,,,
+/home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/fft_dadd_64ns_64ncud.v,1497269727,systemVerilog,,,,fft_dadd_64ns_64ncud,/home/jsk_027/Vivado/2016.4/data/xsim/ip/xsim_ip.ini,ieee_proposed=./ieee_proposed,,,,,,
+/home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/fft_dadddsub_64nsbkb.v,1497269727,systemVerilog,,,,fft_dadddsub_64nsbkb,/home/jsk_027/Vivado/2016.4/data/xsim/ip/xsim_ip.ini,ieee_proposed=./ieee_proposed,,,,,,
+/home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/fft_dmul_64ns_64neOg.v,1497269727,systemVerilog,,,,fft_dmul_64ns_64neOg,/home/jsk_027/Vivado/2016.4/data/xsim/ip/xsim_ip.ini,ieee_proposed=./ieee_proposed,,,,,,
+/home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/fft_dsub_64ns_64ndEe.v,1497269727,systemVerilog,,,,fft_dsub_64ns_64ndEe,/home/jsk_027/Vivado/2016.4/data/xsim/ip/xsim_ip.ini,ieee_proposed=./ieee_proposed,,,,,,
+/home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/ip/xil_defaultlib/fft_ap_dadd_3_full_dsp_64.vhd,1497269819,vhdl,,,,fft_ap_dadd_3_full_dsp_64,/home/jsk_027/Vivado/2016.4/data/xsim/ip/xsim_ip.ini,ieee_proposed=./ieee_proposed,,,,,,
+/home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/ip/xil_defaultlib/fft_ap_dadddsub_3_full_dsp_64.vhd,1497269826,vhdl,,,,fft_ap_dadddsub_3_full_dsp_64,/home/jsk_027/Vivado/2016.4/data/xsim/ip/xsim_ip.ini,ieee_proposed=./ieee_proposed,,,,,,
+/home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/ip/xil_defaultlib/fft_ap_dmul_4_max_dsp_64.vhd,1497269816,vhdl,,,,fft_ap_dmul_4_max_dsp_64,/home/jsk_027/Vivado/2016.4/data/xsim/ip/xsim_ip.ini,ieee_proposed=./ieee_proposed,,,,,,
+/home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/ip/xil_defaultlib/fft_ap_dsub_3_full_dsp_64.vhd,1497269822,vhdl,,,,fft_ap_dsub_3_full_dsp_64,/home/jsk_027/Vivado/2016.4/data/xsim/ip/xsim_ip.ini,ieee_proposed=./ieee_proposed,,,,,,

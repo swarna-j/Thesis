@@ -1,0 +1,715 @@
+
+
+================================================================
+== Vivado HLS Report for 'fft'
+================================================================
+* Date:           Tue Jun 13 09:34:04 2017
+
+* Version:        2016.4 (Build 1733598 on Wed Dec 14 22:59:20 MST 2016)
+* Project:        machsuite_fft_workspace
+* Solution:       solution1
+* Product family: zynq
+* Target device:  xc7z020clg484-1
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing (ns): 
+    * Summary: 
+    +--------+-------+----------+------------+
+    |  Clock | Target| Estimated| Uncertainty|
+    +--------+-------+----------+------------+
+    |ap_clk  |  10.00|      8.23|        0.00|
+    +--------+-------+----------+------------+
+
++ Latency (clock cycles): 
+    * Summary: 
+    +-------+--------+-------+--------+---------+
+    |     Latency    |    Interval    | Pipeline|
+    |  min  |   max  |  min  |   max  |   Type  |
+    +-------+--------+-------+--------+---------+
+    |  51221|  235541|  51222|  235542|   none  |
+    +-------+--------+-------+--------+---------+
+
+    + Detail: 
+        * Instance: 
+        N/A
+
+        * Loop: 
+        +----------+-------+--------+--------------+-----------+-----------+------------+----------+
+        |          |     Latency    |   Iteration  |  Initiation Interval  |    Trip    |          |
+        | Loop Name|  min  |   max  |    Latency   |  achieved |   target  |    Count   | Pipelined|
+        +----------+-------+--------+--------------+-----------+-----------+------------+----------+
+        |- outer   |  51220|  235540| 5122 ~ 23554 |          -|          -|          10|    no    |
+        | + inner  |   5120|   23552|    10 ~ 23   |          -|          -| 512 ~ 1024 |    no    |
+        +----------+-------+--------+--------------+-----------+-----------+------------+----------+
+
+============================================================
++ Verbose Summary: Synthesis Manager
+============================================================
+InlineROM: 1
+ExposeGlobal: 0
+============================================================
++ Verbose Summary: CDFG Model
+============================================================
+IsTopModel: 1
+ResetActiveHigh: 1
+IsCombinational: 0
+IsDatapathOnly: 0
+HasWiredReturn: 1
+HasMFsm: 0
+HasVarLatency: 1
+IsPipeline: 0
+IsRtlPipelined: 0
+IsInstanceOverlapped: 0
+IsDontTouch: 0
+HasImplIP: 0
+IsGatedGlobalClock: 0
+
+
+============================================================
++ Verbose Summary: Schedule
+============================================================
+* Number of FSM states: 25
+* Pipeline: 0
+* Dataflow Pipeline: 0
+
+* FSM state transitions: 
+1 --> 
+	2  / true
+2 --> 
+	3  / (!exitcond)
+3 --> 
+	4  / (icmp)
+	2  / (!icmp)
+4 --> 
+	5  / true
+5 --> 
+	6  / true
+6 --> 
+	7  / true
+7 --> 
+	8  / true
+8 --> 
+	9  / true
+9 --> 
+	10  / true
+10 --> 
+	11  / true
+11 --> 
+	12  / (!tmp_9)
+	25  / (tmp_9)
+12 --> 
+	13  / true
+13 --> 
+	14  / true
+14 --> 
+	15  / true
+15 --> 
+	16  / true
+16 --> 
+	17  / true
+17 --> 
+	18  / true
+18 --> 
+	19  / true
+19 --> 
+	20  / true
+20 --> 
+	21  / true
+21 --> 
+	22  / true
+22 --> 
+	23  / true
+23 --> 
+	24  / true
+24 --> 
+	25  / true
+25 --> 
+	3  / true
+* FSM state operations: 
+
+ <State 1>: 1.57ns
+ST_1: StgValue_26 (5)  [1/1] 0.00ns
+:0  call void (...)* @_ssdm_op_SpecBitsMap([1024 x double]* %real_r) nounwind, !map !7
+
+ST_1: StgValue_27 (6)  [1/1] 0.00ns
+:1  call void (...)* @_ssdm_op_SpecBitsMap([1024 x double]* %img) nounwind, !map !13
+
+ST_1: StgValue_28 (7)  [1/1] 0.00ns
+:2  call void (...)* @_ssdm_op_SpecBitsMap([512 x double]* %real_twid) nounwind, !map !17
+
+ST_1: StgValue_29 (8)  [1/1] 0.00ns
+:3  call void (...)* @_ssdm_op_SpecBitsMap([512 x double]* %img_twid) nounwind, !map !23
+
+ST_1: StgValue_30 (9)  [1/1] 0.00ns
+:4  call void (...)* @_ssdm_op_SpecTopModule([4 x i8]* @fft_str) nounwind
+
+ST_1: StgValue_31 (10)  [1/1] 1.57ns  loc: MachSuite/fft/strided/fft.c:10
+:5  br label %1
+
+
+ <State 2>: 1.88ns
+ST_2: odd (12)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:10
+:0  %odd = phi i30 [ 512, %0 ], [ %tmp_16, %6 ]
+
+ST_2: log (13)  [1/1] 0.00ns
+:1  %log = phi i4 [ 0, %0 ], [ %log_1, %6 ]
+
+ST_2: odd_cast (14)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:10
+:2  %odd_cast = sext i30 %odd to i32
+
+ST_2: log_cast2_cast (15)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:10
+:3  %log_cast2_cast = zext i4 %log to i10
+
+ST_2: exitcond (16)  [1/1] 1.88ns  loc: MachSuite/fft/strided/fft.c:10
+:4  %exitcond = icmp eq i4 %log, -6
+
+ST_2: StgValue_37 (17)  [1/1] 0.00ns
+:5  call void (...)* @_ssdm_op_SpecLoopTripCount(i64 10, i64 10, i64 10)
+
+ST_2: log_1 (18)  [1/1] 0.80ns  loc: MachSuite/fft/strided/fft.c:10
+:6  %log_1 = add i4 %log, 1
+
+ST_2: StgValue_39 (19)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:10
+:7  br i1 %exitcond, label %7, label %2
+
+ST_2: StgValue_40 (21)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:10
+:0  call void (...)* @_ssdm_op_SpecLoopName([6 x i8]* @p_str) nounwind
+
+ST_2: tmp_8 (22)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:10
+:1  %tmp_8 = call i32 (...)* @_ssdm_op_SpecRegionBegin([6 x i8]* @p_str) nounwind
+
+ST_2: tmp (23)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:10
+:2  %tmp = trunc i30 %odd to i10
+
+ST_2: tmp_12 (24)  [1/1] 1.37ns  loc: MachSuite/fft/strided/fft.c:13
+:3  %tmp_12 = xor i10 %tmp, -1
+
+ST_2: StgValue_44 (25)  [1/1] 1.57ns  loc: MachSuite/fft/strided/fft.c:11
+:4  br label %3
+
+ST_2: StgValue_45 (87)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:33
+:0  ret void
+
+
+ <State 3>: 5.45ns
+ST_3: odd1 (27)  [1/1] 0.00ns
+:0  %odd1 = phi i32 [ %odd_cast, %2 ], [ %odd_2, %._crit_edge ]
+
+ST_3: tmp_14 (28)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:11
+:1  %tmp_14 = call i22 @_ssdm_op_PartSelect.i22.i32.i32.i32(i32 %odd1, i32 10, i32 31)
+
+ST_3: icmp (29)  [1/1] 2.37ns  loc: MachSuite/fft/strided/fft.c:11
+:2  %icmp = icmp slt i22 %tmp_14, 1
+
+ST_3: StgValue_49 (30)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:11
+:3  br i1 %icmp, label %4, label %6
+
+ST_3: tmp_15 (35)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:10 (grouped into LUT with out node rootindex)
+:3  %tmp_15 = trunc i32 %odd1 to i10
+
+ST_3: odd_1 (36)  [1/1] 1.37ns  loc: MachSuite/fft/strided/fft.c:12
+:4  %odd_1 = or i32 %odd1, %odd_cast
+
+ST_3: even (37)  [1/1] 1.37ns  loc: MachSuite/fft/strided/fft.c:13
+:5  %even = xor i32 %odd_1, %odd_cast
+
+ST_3: even_cast (38)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:13 (grouped into LUT with out node rootindex)
+:6  %even_cast = and i10 %tmp_15, %tmp_12
+
+ST_3: tmp_2 (39)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:15
+:7  %tmp_2 = sext i32 %even to i64
+
+ST_3: real_addr (40)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:15
+:8  %real_addr = getelementptr [1024 x double]* %real_r, i64 0, i64 %tmp_2
+
+ST_3: real_load (41)  [2/2] 2.71ns  loc: MachSuite/fft/strided/fft.c:15
+:9  %real_load = load double* %real_addr, align 8
+
+ST_3: tmp_3 (42)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:15
+:10  %tmp_3 = sext i32 %odd_1 to i64
+
+ST_3: real_addr_1 (43)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:15
+:11  %real_addr_1 = getelementptr [1024 x double]* %real_r, i64 0, i64 %tmp_3
+
+ST_3: real_load_1 (44)  [2/2] 2.71ns  loc: MachSuite/fft/strided/fft.c:15
+:12  %real_load_1 = load double* %real_addr_1, align 8
+
+ST_3: img_addr (49)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:19
+:17  %img_addr = getelementptr [1024 x double]* %img, i64 0, i64 %tmp_2
+
+ST_3: img_load (50)  [2/2] 2.71ns  loc: MachSuite/fft/strided/fft.c:19
+:18  %img_load = load double* %img_addr, align 8
+
+ST_3: img_addr_1 (51)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:19
+:19  %img_addr_1 = getelementptr [1024 x double]* %img, i64 0, i64 %tmp_3
+
+ST_3: img_load_1 (52)  [2/2] 2.71ns  loc: MachSuite/fft/strided/fft.c:19
+:20  %img_load_1 = load double* %img_addr_1, align 8
+
+ST_3: rootindex (57)  [1/1] 2.75ns  loc: MachSuite/fft/strided/fft.c:23 (out node of the LUT)
+:25  %rootindex = shl i10 %even_cast, %log_cast2_cast
+
+ST_3: empty_6 (82)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:32
+:0  %empty_6 = call i32 (...)* @_ssdm_op_SpecRegionEnd([6 x i8]* @p_str, i32 %tmp_8) nounwind
+
+ST_3: tmp_17 (83)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:10
+:1  %tmp_17 = call i29 @_ssdm_op_PartSelect.i29.i30.i32.i32(i30 %odd, i32 1, i32 29)
+
+ST_3: tmp_16 (84)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:10
+:2  %tmp_16 = sext i29 %tmp_17 to i30
+
+ST_3: StgValue_68 (85)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:10
+:3  br label %1
+
+
+ <State 4>: 2.71ns
+ST_4: real_load (41)  [1/2] 2.71ns  loc: MachSuite/fft/strided/fft.c:15
+:9  %real_load = load double* %real_addr, align 8
+
+ST_4: real_load_1 (44)  [1/2] 2.71ns  loc: MachSuite/fft/strided/fft.c:15
+:12  %real_load_1 = load double* %real_addr_1, align 8
+
+ST_4: img_load (50)  [1/2] 2.71ns  loc: MachSuite/fft/strided/fft.c:19
+:18  %img_load = load double* %img_addr, align 8
+
+ST_4: img_load_1 (52)  [1/2] 2.71ns  loc: MachSuite/fft/strided/fft.c:19
+:20  %img_load_1 = load double* %img_addr_1, align 8
+
+
+ <State 5>: 8.23ns
+ST_5: temp (45)  [5/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:15
+:13  %temp = fadd double %real_load, %real_load_1
+
+ST_5: tmp_5 (46)  [5/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:16
+:14  %tmp_5 = fsub double %real_load, %real_load_1
+
+ST_5: temp_1 (53)  [5/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:19
+:21  %temp_1 = fadd double %img_load, %img_load_1
+
+ST_5: tmp_7 (54)  [5/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:20
+:22  %tmp_7 = fsub double %img_load, %img_load_1
+
+
+ <State 6>: 8.23ns
+ST_6: temp (45)  [4/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:15
+:13  %temp = fadd double %real_load, %real_load_1
+
+ST_6: tmp_5 (46)  [4/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:16
+:14  %tmp_5 = fsub double %real_load, %real_load_1
+
+ST_6: temp_1 (53)  [4/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:19
+:21  %temp_1 = fadd double %img_load, %img_load_1
+
+ST_6: tmp_7 (54)  [4/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:20
+:22  %tmp_7 = fsub double %img_load, %img_load_1
+
+
+ <State 7>: 8.23ns
+ST_7: temp (45)  [3/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:15
+:13  %temp = fadd double %real_load, %real_load_1
+
+ST_7: tmp_5 (46)  [3/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:16
+:14  %tmp_5 = fsub double %real_load, %real_load_1
+
+ST_7: temp_1 (53)  [3/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:19
+:21  %temp_1 = fadd double %img_load, %img_load_1
+
+ST_7: tmp_7 (54)  [3/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:20
+:22  %tmp_7 = fsub double %img_load, %img_load_1
+
+
+ <State 8>: 8.23ns
+ST_8: temp (45)  [2/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:15
+:13  %temp = fadd double %real_load, %real_load_1
+
+ST_8: tmp_5 (46)  [2/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:16
+:14  %tmp_5 = fsub double %real_load, %real_load_1
+
+ST_8: temp_1 (53)  [2/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:19
+:21  %temp_1 = fadd double %img_load, %img_load_1
+
+ST_8: tmp_7 (54)  [2/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:20
+:22  %tmp_7 = fsub double %img_load, %img_load_1
+
+
+ <State 9>: 8.23ns
+ST_9: temp (45)  [1/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:15
+:13  %temp = fadd double %real_load, %real_load_1
+
+ST_9: tmp_5 (46)  [1/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:16
+:14  %tmp_5 = fsub double %real_load, %real_load_1
+
+ST_9: temp_1 (53)  [1/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:19
+:21  %temp_1 = fadd double %img_load, %img_load_1
+
+ST_9: tmp_7 (54)  [1/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:20
+:22  %tmp_7 = fsub double %img_load, %img_load_1
+
+
+ <State 10>: 2.71ns
+ST_10: StgValue_93 (47)  [1/1] 2.71ns  loc: MachSuite/fft/strided/fft.c:16
+:15  store double %tmp_5, double* %real_addr_1, align 8
+
+ST_10: StgValue_94 (55)  [1/1] 2.71ns  loc: MachSuite/fft/strided/fft.c:20
+:23  store double %tmp_7, double* %img_addr_1, align 8
+
+
+ <State 11>: 2.71ns
+ST_11: StgValue_95 (32)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:11
+:0  call void (...)* @_ssdm_op_SpecLoopName([6 x i8]* @p_str2) nounwind
+
+ST_11: tmp_13 (33)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:11
+:1  %tmp_13 = call i32 (...)* @_ssdm_op_SpecRegionBegin([6 x i8]* @p_str2) nounwind
+
+ST_11: StgValue_97 (34)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:12
+:2  call void (...)* @_ssdm_op_SpecLoopTripCount(i32 512, i32 1024, i32 768, [1 x i8]* @p_str1) nounwind
+
+ST_11: StgValue_98 (48)  [1/1] 2.71ns  loc: MachSuite/fft/strided/fft.c:17
+:16  store double %temp, double* %real_addr, align 8
+
+ST_11: StgValue_99 (56)  [1/1] 2.71ns  loc: MachSuite/fft/strided/fft.c:21
+:24  store double %temp_1, double* %img_addr, align 8
+
+ST_11: tmp_9 (58)  [1/1] 2.07ns  loc: MachSuite/fft/strided/fft.c:24
+:26  %tmp_9 = icmp eq i10 %rootindex, 0
+
+ST_11: StgValue_101 (59)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:24
+:27  br i1 %tmp_9, label %._crit_edge, label %5
+
+
+ <State 12>: 2.71ns
+ST_12: tmp_s (61)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:25
+:0  %tmp_s = zext i10 %rootindex to i64
+
+ST_12: real_twid_addr (62)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:25
+:1  %real_twid_addr = getelementptr [512 x double]* %real_twid, i64 0, i64 %tmp_s
+
+ST_12: real_twid_load (63)  [2/2] 2.71ns  loc: MachSuite/fft/strided/fft.c:25
+:2  %real_twid_load = load double* %real_twid_addr, align 8
+
+ST_12: real_load_2 (64)  [2/2] 2.71ns  loc: MachSuite/fft/strided/fft.c:25
+:3  %real_load_2 = load double* %real_addr_1, align 8
+
+ST_12: img_twid_addr (66)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:25
+:5  %img_twid_addr = getelementptr [512 x double]* %img_twid, i64 0, i64 %tmp_s
+
+ST_12: img_twid_load (67)  [2/2] 2.71ns  loc: MachSuite/fft/strided/fft.c:25
+:6  %img_twid_load = load double* %img_twid_addr, align 8
+
+ST_12: img_load_2 (68)  [2/2] 2.71ns  loc: MachSuite/fft/strided/fft.c:25
+:7  %img_load_2 = load double* %img_addr_1, align 8
+
+
+ <State 13>: 2.71ns
+ST_13: real_twid_load (63)  [1/2] 2.71ns  loc: MachSuite/fft/strided/fft.c:25
+:2  %real_twid_load = load double* %real_twid_addr, align 8
+
+ST_13: real_load_2 (64)  [1/2] 2.71ns  loc: MachSuite/fft/strided/fft.c:25
+:3  %real_load_2 = load double* %real_addr_1, align 8
+
+ST_13: img_twid_load (67)  [1/2] 2.71ns  loc: MachSuite/fft/strided/fft.c:25
+:6  %img_twid_load = load double* %img_twid_addr, align 8
+
+ST_13: img_load_2 (68)  [1/2] 2.71ns  loc: MachSuite/fft/strided/fft.c:25
+:7  %img_load_2 = load double* %img_addr_1, align 8
+
+
+ <State 14>: 7.79ns
+ST_14: tmp_1 (65)  [6/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:25
+:4  %tmp_1 = fmul double %real_twid_load, %real_load_2
+
+ST_14: tmp_4 (69)  [6/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:25
+:8  %tmp_4 = fmul double %img_twid_load, %img_load_2
+
+ST_14: tmp_6 (71)  [6/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:27
+:10  %tmp_6 = fmul double %real_twid_load, %img_load_2
+
+ST_14: tmp_10 (72)  [6/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:27
+:11  %tmp_10 = fmul double %img_twid_load, %real_load_2
+
+
+ <State 15>: 7.79ns
+ST_15: tmp_1 (65)  [5/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:25
+:4  %tmp_1 = fmul double %real_twid_load, %real_load_2
+
+ST_15: tmp_4 (69)  [5/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:25
+:8  %tmp_4 = fmul double %img_twid_load, %img_load_2
+
+ST_15: tmp_6 (71)  [5/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:27
+:10  %tmp_6 = fmul double %real_twid_load, %img_load_2
+
+ST_15: tmp_10 (72)  [5/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:27
+:11  %tmp_10 = fmul double %img_twid_load, %real_load_2
+
+
+ <State 16>: 7.79ns
+ST_16: tmp_1 (65)  [4/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:25
+:4  %tmp_1 = fmul double %real_twid_load, %real_load_2
+
+ST_16: tmp_4 (69)  [4/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:25
+:8  %tmp_4 = fmul double %img_twid_load, %img_load_2
+
+ST_16: tmp_6 (71)  [4/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:27
+:10  %tmp_6 = fmul double %real_twid_load, %img_load_2
+
+ST_16: tmp_10 (72)  [4/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:27
+:11  %tmp_10 = fmul double %img_twid_load, %real_load_2
+
+
+ <State 17>: 7.79ns
+ST_17: tmp_1 (65)  [3/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:25
+:4  %tmp_1 = fmul double %real_twid_load, %real_load_2
+
+ST_17: tmp_4 (69)  [3/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:25
+:8  %tmp_4 = fmul double %img_twid_load, %img_load_2
+
+ST_17: tmp_6 (71)  [3/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:27
+:10  %tmp_6 = fmul double %real_twid_load, %img_load_2
+
+ST_17: tmp_10 (72)  [3/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:27
+:11  %tmp_10 = fmul double %img_twid_load, %real_load_2
+
+
+ <State 18>: 7.79ns
+ST_18: tmp_1 (65)  [2/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:25
+:4  %tmp_1 = fmul double %real_twid_load, %real_load_2
+
+ST_18: tmp_4 (69)  [2/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:25
+:8  %tmp_4 = fmul double %img_twid_load, %img_load_2
+
+ST_18: tmp_6 (71)  [2/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:27
+:10  %tmp_6 = fmul double %real_twid_load, %img_load_2
+
+ST_18: tmp_10 (72)  [2/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:27
+:11  %tmp_10 = fmul double %img_twid_load, %real_load_2
+
+
+ <State 19>: 7.79ns
+ST_19: tmp_1 (65)  [1/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:25
+:4  %tmp_1 = fmul double %real_twid_load, %real_load_2
+
+ST_19: tmp_4 (69)  [1/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:25
+:8  %tmp_4 = fmul double %img_twid_load, %img_load_2
+
+ST_19: tmp_6 (71)  [1/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:27
+:10  %tmp_6 = fmul double %real_twid_load, %img_load_2
+
+ST_19: tmp_10 (72)  [1/6] 7.79ns  loc: MachSuite/fft/strided/fft.c:27
+:11  %tmp_10 = fmul double %img_twid_load, %real_load_2
+
+
+ <State 20>: 8.23ns
+ST_20: temp_2 (70)  [5/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:25
+:9  %temp_2 = fsub double %tmp_1, %tmp_4
+
+ST_20: tmp_11 (73)  [5/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:27
+:12  %tmp_11 = fadd double %tmp_6, %tmp_10
+
+
+ <State 21>: 8.23ns
+ST_21: temp_2 (70)  [4/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:25
+:9  %temp_2 = fsub double %tmp_1, %tmp_4
+
+ST_21: tmp_11 (73)  [4/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:27
+:12  %tmp_11 = fadd double %tmp_6, %tmp_10
+
+
+ <State 22>: 8.23ns
+ST_22: temp_2 (70)  [3/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:25
+:9  %temp_2 = fsub double %tmp_1, %tmp_4
+
+ST_22: tmp_11 (73)  [3/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:27
+:12  %tmp_11 = fadd double %tmp_6, %tmp_10
+
+
+ <State 23>: 8.23ns
+ST_23: temp_2 (70)  [2/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:25
+:9  %temp_2 = fsub double %tmp_1, %tmp_4
+
+ST_23: tmp_11 (73)  [2/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:27
+:12  %tmp_11 = fadd double %tmp_6, %tmp_10
+
+
+ <State 24>: 8.23ns
+ST_24: temp_2 (70)  [1/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:25
+:9  %temp_2 = fsub double %tmp_1, %tmp_4
+
+ST_24: tmp_11 (73)  [1/5] 8.23ns  loc: MachSuite/fft/strided/fft.c:27
+:12  %tmp_11 = fadd double %tmp_6, %tmp_10
+
+
+ <State 25>: 2.71ns
+ST_25: StgValue_147 (74)  [1/1] 2.71ns  loc: MachSuite/fft/strided/fft.c:27
+:13  store double %tmp_11, double* %img_addr_1, align 8
+
+ST_25: StgValue_148 (75)  [1/1] 2.71ns  loc: MachSuite/fft/strided/fft.c:29
+:14  store double %temp_2, double* %real_addr_1, align 8
+
+ST_25: StgValue_149 (76)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:30
+:15  br label %._crit_edge
+
+ST_25: empty (78)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:31
+._crit_edge:0  %empty = call i32 (...)* @_ssdm_op_SpecRegionEnd([6 x i8]* @p_str2, i32 %tmp_13) nounwind
+
+ST_25: odd_2 (79)  [1/1] 2.44ns  loc: MachSuite/fft/strided/fft.c:11
+._crit_edge:1  %odd_2 = add nsw i32 %odd_1, 1
+
+ST_25: StgValue_152 (80)  [1/1] 0.00ns  loc: MachSuite/fft/strided/fft.c:11
+._crit_edge:2  br label %3
+
+
+
+============================================================
++ Verbose Summary: Timing violations
+============================================================
+Target clock period: 10ns, clock uncertainty: 0ns.
+
+ <State 1>: 1.57ns
+The critical path consists of the following:
+	multiplexor before 'phi' operation ('odd', MachSuite/fft/strided/fft.c:10) with incoming values : ('tmp_16', MachSuite/fft/strided/fft.c:10) [12]  (1.57 ns)
+
+ <State 2>: 1.88ns
+The critical path consists of the following:
+	'phi' operation ('log') with incoming values : ('log', MachSuite/fft/strided/fft.c:10) [13]  (0 ns)
+	'icmp' operation ('exitcond', MachSuite/fft/strided/fft.c:10) [16]  (1.88 ns)
+
+ <State 3>: 5.45ns
+The critical path consists of the following:
+	'phi' operation ('odd') with incoming values : ('odd_cast', MachSuite/fft/strided/fft.c:10) ('odd', MachSuite/fft/strided/fft.c:11) [27]  (0 ns)
+	'or' operation ('odd', MachSuite/fft/strided/fft.c:12) [36]  (1.37 ns)
+	'xor' operation ('even', MachSuite/fft/strided/fft.c:13) [37]  (1.37 ns)
+	'getelementptr' operation ('real_addr', MachSuite/fft/strided/fft.c:15) [40]  (0 ns)
+	'load' operation ('real_load', MachSuite/fft/strided/fft.c:15) on array 'real_r' [41]  (2.71 ns)
+
+ <State 4>: 2.71ns
+The critical path consists of the following:
+	'load' operation ('real_load', MachSuite/fft/strided/fft.c:15) on array 'real_r' [41]  (2.71 ns)
+
+ <State 5>: 8.23ns
+The critical path consists of the following:
+	'dadd' operation ('temp', MachSuite/fft/strided/fft.c:15) [45]  (8.23 ns)
+
+ <State 6>: 8.23ns
+The critical path consists of the following:
+	'dadd' operation ('temp', MachSuite/fft/strided/fft.c:15) [45]  (8.23 ns)
+
+ <State 7>: 8.23ns
+The critical path consists of the following:
+	'dadd' operation ('temp', MachSuite/fft/strided/fft.c:15) [45]  (8.23 ns)
+
+ <State 8>: 8.23ns
+The critical path consists of the following:
+	'dadd' operation ('temp', MachSuite/fft/strided/fft.c:15) [45]  (8.23 ns)
+
+ <State 9>: 8.23ns
+The critical path consists of the following:
+	'dadd' operation ('temp', MachSuite/fft/strided/fft.c:15) [45]  (8.23 ns)
+
+ <State 10>: 2.71ns
+The critical path consists of the following:
+	'store' operation (MachSuite/fft/strided/fft.c:16) of variable 'tmp_5', MachSuite/fft/strided/fft.c:16 on array 'real_r' [47]  (2.71 ns)
+
+ <State 11>: 2.71ns
+The critical path consists of the following:
+	'store' operation (MachSuite/fft/strided/fft.c:17) of variable 'temp', MachSuite/fft/strided/fft.c:15 on array 'real_r' [48]  (2.71 ns)
+
+ <State 12>: 2.71ns
+The critical path consists of the following:
+	'getelementptr' operation ('real_twid_addr', MachSuite/fft/strided/fft.c:25) [62]  (0 ns)
+	'load' operation ('real_twid_load', MachSuite/fft/strided/fft.c:25) on array 'real_twid' [63]  (2.71 ns)
+
+ <State 13>: 2.71ns
+The critical path consists of the following:
+	'load' operation ('real_twid_load', MachSuite/fft/strided/fft.c:25) on array 'real_twid' [63]  (2.71 ns)
+
+ <State 14>: 7.79ns
+The critical path consists of the following:
+	'dmul' operation ('tmp_1', MachSuite/fft/strided/fft.c:25) [65]  (7.79 ns)
+
+ <State 15>: 7.79ns
+The critical path consists of the following:
+	'dmul' operation ('tmp_1', MachSuite/fft/strided/fft.c:25) [65]  (7.79 ns)
+
+ <State 16>: 7.79ns
+The critical path consists of the following:
+	'dmul' operation ('tmp_1', MachSuite/fft/strided/fft.c:25) [65]  (7.79 ns)
+
+ <State 17>: 7.79ns
+The critical path consists of the following:
+	'dmul' operation ('tmp_1', MachSuite/fft/strided/fft.c:25) [65]  (7.79 ns)
+
+ <State 18>: 7.79ns
+The critical path consists of the following:
+	'dmul' operation ('tmp_1', MachSuite/fft/strided/fft.c:25) [65]  (7.79 ns)
+
+ <State 19>: 7.79ns
+The critical path consists of the following:
+	'dmul' operation ('tmp_1', MachSuite/fft/strided/fft.c:25) [65]  (7.79 ns)
+
+ <State 20>: 8.23ns
+The critical path consists of the following:
+	'dsub' operation ('temp', MachSuite/fft/strided/fft.c:25) [70]  (8.23 ns)
+
+ <State 21>: 8.23ns
+The critical path consists of the following:
+	'dsub' operation ('temp', MachSuite/fft/strided/fft.c:25) [70]  (8.23 ns)
+
+ <State 22>: 8.23ns
+The critical path consists of the following:
+	'dsub' operation ('temp', MachSuite/fft/strided/fft.c:25) [70]  (8.23 ns)
+
+ <State 23>: 8.23ns
+The critical path consists of the following:
+	'dsub' operation ('temp', MachSuite/fft/strided/fft.c:25) [70]  (8.23 ns)
+
+ <State 24>: 8.23ns
+The critical path consists of the following:
+	'dsub' operation ('temp', MachSuite/fft/strided/fft.c:25) [70]  (8.23 ns)
+
+ <State 25>: 2.71ns
+The critical path consists of the following:
+	'store' operation (MachSuite/fft/strided/fft.c:27) of variable 'tmp_11', MachSuite/fft/strided/fft.c:27 on array 'img' [74]  (2.71 ns)
+
+
+============================================================
++ Verbose Summary: Binding
+============================================================
+N/A
+* FSMD analyzer results:
+  - Output states:
+ - Input state : 
+  - Chain level:
+	State 1
+	State 2
+	State 3
+	State 4
+	State 5
+	State 6
+	State 7
+	State 8
+	State 9
+	State 10
+	State 11
+	State 12
+	State 13
+	State 14
+	State 15
+	State 16
+	State 17
+	State 18
+	State 19
+	State 20
+	State 21
+	State 22
+	State 23
+	State 24
+	State 25
+
+
+============================================================
++ Verbose Summary: Datapath Resource usage 
+============================================================
+N/A

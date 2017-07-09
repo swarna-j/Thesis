@@ -1,0 +1,40 @@
+<AutoPilot:ProjectResources xmlns:AutoPilot="com.autoesl.autopilot.ui.directiveView">
+    <sourceFile name="">
+        <directive functionName="fft" label="" functionLabel="">
+            <pragma name="RESOURCE">
+                <option name="variable" value="real" positionalBoolean="4"/>
+                <option name="core" value="RAM_1P_BRAM"/>
+            </pragma>
+        </directive>
+        <directive functionName="fft" label="" functionLabel="">
+            <pragma name="RESOURCE">
+                <option name="variable" value="img" positionalBoolean="4"/>
+                <option name="core" value="RAM_1P_BRAM"/>
+            </pragma>
+        </directive>
+        <directive functionName="fft" label="" functionLabel="">
+            <pragma name="RESOURCE">
+                <option name="variable" value="real_twid" positionalBoolean="4"/>
+                <option name="core" value="RAM_1P_BRAM"/>
+            </pragma>
+        </directive>
+        <directive functionName="fft" label="" functionLabel="">
+            <pragma name="RESOURCE">
+                <option name="variable" value="img_twid" positionalBoolean="4"/>
+                <option name="core" value="ROM_1P_BRAM"/>
+            </pragma>
+        </directive>
+        <directive functionName="fft" label="outer" functionLabel="">
+            <pragma name="LOOP_TRIPCOUNT">
+                <option name="max" value="10"/>
+            </pragma>
+        </directive>
+        <directive functionName="fft" label="inner" functionLabel="">
+            <pragma name="LOOP_TRIPCOUNT">
+                <option name="min" value="512"/>
+                <option name="max" value="1024"/>
+            </pragma>
+        </directive>
+    </sourceFile>
+</AutoPilot:ProjectResources>
+

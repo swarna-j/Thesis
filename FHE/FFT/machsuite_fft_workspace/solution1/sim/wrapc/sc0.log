@@ -1,0 +1,30 @@
+   Build using "/home/jsk_027/Vivado_HLS/2016.4/lnx64/tools/gcc/bin/g++"
+   Compiling apatb_fft.cpp
+   Compiling (apcc) fft.c_pre.c.tb.c
+INFO: [HLS 200-10] Running '/home/jsk_027/Vivado_HLS/2016.4/bin/unwrapped/lnx64.o/apcc'
+INFO: [HLS 200-10] For user 'jsk_027' on host 'toshiba' (Linux_x86_64 version 3.16.0-77-generic) on Mon Jun 12 17:46:05 IST 2017
+INFO: [HLS 200-10] On os Ubuntu 14.04.5 LTS
+INFO: [HLS 200-10] In directory '/home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/wrapc'
+clang: warning: argument unused during compilation: '-fno-builtin-isinf'
+clang: warning: argument unused during compilation: '-fno-builtin-isnan'
+INFO: [APCC 202-3] Tmp directory is /tmp/apcc_db_jsk_027/29251497269765340772
+INFO: [APCC 202-1] APCC is done.
+   Compiling (apcc) fft_test.c_pre.c.tb.c
+INFO: [HLS 200-10] Running '/home/jsk_027/Vivado_HLS/2016.4/bin/unwrapped/lnx64.o/apcc'
+INFO: [HLS 200-10] For user 'jsk_027' on host 'toshiba' (Linux_x86_64 version 3.16.0-77-generic) on Mon Jun 12 17:46:07 IST 2017
+INFO: [HLS 200-10] On os Ubuntu 14.04.5 LTS
+INFO: [HLS 200-10] In directory '/home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/wrapc'
+clang: warning: argument unused during compilation: '-fno-builtin-isinf'
+clang: warning: argument unused during compilation: '-fno-builtin-isnan'
+/home/jsk_027/Thesis/MachSuite/fft/strided/fft_test.c:19:19: warning: implicitly declaring library function 'cos' with type 'double (double)'
+        real[n] = cos(typed);
+                  ^
+/home/jsk_027/Thesis/MachSuite/fft/strided/fft_test.c:19:19: note: please include the header <math.h> or explicitly provide a declaration for 'cos'
+/home/jsk_027/Thesis/MachSuite/fft/strided/fft_test.c:20:25: warning: implicitly declaring library function 'sin' with type 'double (double)'
+        img[n] = (-1.0)*sin(typed);
+                        ^
+/home/jsk_027/Thesis/MachSuite/fft/strided/fft_test.c:20:25: note: please include the header <math.h> or explicitly provide a declaration for 'sin'
+2 warnings generated.
+INFO: [APCC 202-3] Tmp directory is /tmp/apcc_db_jsk_027/29781497269767432706
+INFO: [APCC 202-1] APCC is done.
+   Generating cosim.tv.exe

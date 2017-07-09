@@ -1,0 +1,221 @@
+
+
+================================================================
+== Vivado HLS Report for 'fft'
+================================================================
+* Date:           Tue Jun 13 09:34:05 2017
+
+* Version:        2016.4 (Build 1733598 on Wed Dec 14 22:59:20 MST 2016)
+* Project:        machsuite_fft_workspace
+* Solution:       solution1
+* Product family: zynq
+* Target device:  xc7z020clg484-1
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing (ns): 
+    * Summary: 
+    +--------+-------+----------+------------+
+    |  Clock | Target| Estimated| Uncertainty|
+    +--------+-------+----------+------------+
+    |ap_clk  |  10.00|      8.23|        0.00|
+    +--------+-------+----------+------------+
+
++ Latency (clock cycles): 
+    * Summary: 
+    +-------+--------+-------+--------+---------+
+    |     Latency    |    Interval    | Pipeline|
+    |  min  |   max  |  min  |   max  |   Type  |
+    +-------+--------+-------+--------+---------+
+    |  51221|  235541|  51222|  235542|   none  |
+    +-------+--------+-------+--------+---------+
+
+    + Detail: 
+        * Instance: 
+        N/A
+
+        * Loop: 
+        +----------+-------+--------+--------------+-----------+-----------+------------+----------+
+        |          |     Latency    |   Iteration  |  Initiation Interval  |    Trip    |          |
+        | Loop Name|  min  |   max  |    Latency   |  achieved |   target  |    Count   | Pipelined|
+        +----------+-------+--------+--------------+-----------+-----------+------------+----------+
+        |- outer   |  51220|  235540| 5122 ~ 23554 |          -|          -|          10|    no    |
+        | + inner  |   5120|   23552|    10 ~ 23   |          -|          -| 512 ~ 1024 |    no    |
+        +----------+-------+--------+--------------+-----------+-----------+------------+----------+
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++-----------------+---------+-------+--------+-------+
+|       Name      | BRAM_18K| DSP48E|   FF   |  LUT  |
++-----------------+---------+-------+--------+-------+
+|DSP              |        -|      -|       -|      -|
+|Expression       |        -|      -|       0|    178|
+|FIFO             |        -|      -|       -|      -|
+|Instance         |        -|     56|    3048|   6908|
+|Memory           |        -|      -|       -|      -|
+|Multiplexer      |        -|      -|       -|    515|
+|Register         |        -|      -|    1248|      -|
++-----------------+---------+-------+--------+-------+
+|Total            |        0|     56|    4296|   7601|
++-----------------+---------+-------+--------+-------+
+|Available        |      280|    220|  106400|  53200|
++-----------------+---------+-------+--------+-------+
+|Utilization (%)  |        0|     25|       4|     14|
++-----------------+---------+-------+--------+-------+
+
++ Detail: 
+    * Instance: 
+    +-------------------------+----------------------+---------+-------+-----+------+
+    |         Instance        |        Module        | BRAM_18K| DSP48E|  FF |  LUT |
+    +-------------------------+----------------------+---------+-------+-----+------+
+    |fft_dadd_64ns_64ncud_U3  |fft_dadd_64ns_64ncud  |        0|      3|  445|  1149|
+    |fft_dadddsub_64nsbkb_U1  |fft_dadddsub_64nsbkb  |        0|      3|  445|  1149|
+    |fft_dadddsub_64nsbkb_U2  |fft_dadddsub_64nsbkb  |        0|      3|  445|  1149|
+    |fft_dmul_64ns_64neOg_U5  |fft_dmul_64ns_64neOg  |        0|     11|  317|   578|
+    |fft_dmul_64ns_64neOg_U6  |fft_dmul_64ns_64neOg  |        0|     11|  317|   578|
+    |fft_dmul_64ns_64neOg_U7  |fft_dmul_64ns_64neOg  |        0|     11|  317|   578|
+    |fft_dmul_64ns_64neOg_U8  |fft_dmul_64ns_64neOg  |        0|     11|  317|   578|
+    |fft_dsub_64ns_64ndEe_U4  |fft_dsub_64ns_64ndEe  |        0|      3|  445|  1149|
+    +-------------------------+----------------------+---------+-------+-----+------+
+    |Total                    |                      |        0|     56| 3048|  6908|
+    +-------------------------+----------------------+---------+-------+-----+------+
+
+    * DSP48: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +---------------------+----------+-------+---+----+------------+------------+
+    |    Variable Name    | Operation| DSP48E| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +---------------------+----------+-------+---+----+------------+------------+
+    |log_1_fu_228_p2      |     +    |      0|  0|   4|           4|           1|
+    |odd_2_fu_320_p2      |     +    |      0|  0|  32|          32|           1|
+    |even_cast_fu_274_p2  |    and   |      0|  0|  11|          10|          10|
+    |exitcond_fu_222_p2   |   icmp   |      0|  0|   2|           4|           4|
+    |icmp_fu_254_p2       |   icmp   |      0|  0|   8|          22|           1|
+    |tmp_9_fu_310_p2      |   icmp   |      0|  0|   4|          10|           1|
+    |odd_1_fu_264_p2      |    or    |      0|  0|  44|          32|          32|
+    |rootindex_fu_291_p2  |    shl   |      0|  0|  18|          10|          10|
+    |even_fu_269_p2       |    xor   |      0|  0|  44|          32|          32|
+    |tmp_12_fu_238_p2     |    xor   |      0|  0|  11|          10|           2|
+    +---------------------+----------+-------+---+----+------------+------------+
+    |Total                |          |      0|  0| 178|         166|          94|
+    +---------------------+----------+-------+---+----+------------+------------+
+
+    * Multiplexer: 
+    +-------------------+----+-----------+-----+-----------+
+    |        Name       | LUT| Input Size| Bits| Total Bits|
+    +-------------------+----+-----------+-----+-----------+
+    |ap_NS_fsm          |  21|         26|    1|         26|
+    |grp_fu_166_opcode  |   2|          3|    2|          6|
+    |grp_fu_166_p0      |  64|          3|   64|        192|
+    |grp_fu_166_p1      |  64|          3|   64|        192|
+    |grp_fu_170_opcode  |   2|          3|    2|          6|
+    |grp_fu_170_p0      |  64|          3|   64|        192|
+    |grp_fu_170_p1      |  64|          3|   64|        192|
+    |img_address0       |  10|          3|   10|         30|
+    |img_address1       |  10|          4|   10|         40|
+    |img_d1             |  64|          3|   64|        192|
+    |log_reg_146        |   4|          2|    4|          8|
+    |odd1_reg_157       |  32|          2|   32|         64|
+    |odd_reg_134        |  30|          2|   30|         60|
+    |real_r_address0    |  10|          3|   10|         30|
+    |real_r_address1    |  10|          4|   10|         40|
+    |real_r_d1          |  64|          3|   64|        192|
+    +-------------------+----+-----------+-----+-----------+
+    |Total              | 515|         70|  495|       1462|
+    +-------------------+----+-----------+-----+-----------+
+
+    * Register: 
+    +------------------------+----+----+-----+-----------+
+    |          Name          | FF | LUT| Bits| Const Bits|
+    +------------------------+----+----+-----+-----------+
+    |ap_CS_fsm               |  25|   0|   25|          0|
+    |img_addr_1_reg_376      |  10|   0|   10|          0|
+    |img_addr_reg_370        |  10|   0|   10|          0|
+    |img_load_1_reg_399      |  64|   0|   64|          0|
+    |img_twid_load_reg_445   |  64|   0|   64|          0|
+    |log_1_reg_340           |   4|   0|    4|          0|
+    |log_cast2_cast_reg_332  |   4|   0|   10|          6|
+    |log_reg_146             |   4|   0|    4|          0|
+    |odd1_reg_157            |  32|   0|   32|          0|
+    |odd_1_reg_353           |  32|   0|   32|          0|
+    |odd_cast_reg_325        |  32|   0|   32|          0|
+    |odd_reg_134             |  30|   0|   30|          0|
+    |real_addr_1_reg_364     |  10|   0|   10|          0|
+    |real_addr_reg_358       |  10|   0|   10|          0|
+    |real_load_1_reg_393     |  64|   0|   64|          0|
+    |real_twid_load_reg_439  |  64|   0|   64|          0|
+    |reg_198                 |  64|   0|   64|          0|
+    |reg_206                 |  64|   0|   64|          0|
+    |rootindex_reg_382       |  10|   0|   10|          0|
+    |temp_1_reg_415          |  64|   0|   64|          0|
+    |temp_2_reg_471          |  64|   0|   64|          0|
+    |temp_reg_405            |  64|   0|   64|          0|
+    |tmp_10_reg_466          |  64|   0|   64|          0|
+    |tmp_11_reg_476          |  64|   0|   64|          0|
+    |tmp_12_reg_345          |  10|   0|   10|          0|
+    |tmp_1_reg_451           |  64|   0|   64|          0|
+    |tmp_4_reg_456           |  64|   0|   64|          0|
+    |tmp_5_reg_410           |  64|   0|   64|          0|
+    |tmp_6_reg_461           |  64|   0|   64|          0|
+    |tmp_7_reg_420           |  64|   0|   64|          0|
+    |tmp_9_reg_425           |   1|   0|    1|          0|
+    +------------------------+----+----+-----+-----------+
+    |Total                   |1248|   0| 1254|          6|
+    +------------------------+----+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++--------------------+-----+-----+------------+--------------+--------------+
+|      RTL Ports     | Dir | Bits|  Protocol  | Source Object|    C Type    |
++--------------------+-----+-----+------------+--------------+--------------+
+|ap_clk              |  in |    1| ap_ctrl_hs |      fft     | return value |
+|ap_rst              |  in |    1| ap_ctrl_hs |      fft     | return value |
+|ap_start            |  in |    1| ap_ctrl_hs |      fft     | return value |
+|ap_done             | out |    1| ap_ctrl_hs |      fft     | return value |
+|ap_idle             | out |    1| ap_ctrl_hs |      fft     | return value |
+|ap_ready            | out |    1| ap_ctrl_hs |      fft     | return value |
+|real_r_address0     | out |   10|  ap_memory |    real_r    |     array    |
+|real_r_ce0          | out |    1|  ap_memory |    real_r    |     array    |
+|real_r_we0          | out |    1|  ap_memory |    real_r    |     array    |
+|real_r_d0           | out |   64|  ap_memory |    real_r    |     array    |
+|real_r_q0           |  in |   64|  ap_memory |    real_r    |     array    |
+|real_r_address1     | out |   10|  ap_memory |    real_r    |     array    |
+|real_r_ce1          | out |    1|  ap_memory |    real_r    |     array    |
+|real_r_we1          | out |    1|  ap_memory |    real_r    |     array    |
+|real_r_d1           | out |   64|  ap_memory |    real_r    |     array    |
+|real_r_q1           |  in |   64|  ap_memory |    real_r    |     array    |
+|img_address0        | out |   10|  ap_memory |      img     |     array    |
+|img_ce0             | out |    1|  ap_memory |      img     |     array    |
+|img_we0             | out |    1|  ap_memory |      img     |     array    |
+|img_d0              | out |   64|  ap_memory |      img     |     array    |
+|img_q0              |  in |   64|  ap_memory |      img     |     array    |
+|img_address1        | out |   10|  ap_memory |      img     |     array    |
+|img_ce1             | out |    1|  ap_memory |      img     |     array    |
+|img_we1             | out |    1|  ap_memory |      img     |     array    |
+|img_d1              | out |   64|  ap_memory |      img     |     array    |
+|img_q1              |  in |   64|  ap_memory |      img     |     array    |
+|real_twid_address0  | out |    9|  ap_memory |   real_twid  |     array    |
+|real_twid_ce0       | out |    1|  ap_memory |   real_twid  |     array    |
+|real_twid_q0        |  in |   64|  ap_memory |   real_twid  |     array    |
+|img_twid_address0   | out |    9|  ap_memory |   img_twid   |     array    |
+|img_twid_ce0        | out |    1|  ap_memory |   img_twid   |     array    |
+|img_twid_q0         |  in |   64|  ap_memory |   img_twid   |     array    |
++--------------------+-----+-----+------------+--------------+--------------+
+

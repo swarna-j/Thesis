@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xd:acceleratorMap xmlns:xd="http://www.xilinx.com/xidane" xd:functionName="fft" xd:componentRef="fft" xd:initiationInterval="235542" xd:clockPeriod="10.000000" xd:sequential="true" xd:hostMachine="64" xd:reset="control">
+  <xd:controlReg xd:name="control" xd:interfaceRef="ap_ctrl" xd:busTypeRef="acc_handshake" xd:type="acc_handshake"/>
+  <xd:arg xd:name="real_r_d0" xd:originalName="real_r_d0" xd:direction="out" xd:interfaceRef="real_r_d0" xd:busTypeRef="ap_memory" xd:arraySize="1024" xd:dataWidth="64"/>
+  <xd:arg xd:name="real_r_q0" xd:originalName="real_r_q0" xd:direction="in" xd:interfaceRef="real_r_q0" xd:busTypeRef="ap_memory" xd:arraySize="1024" xd:dataWidth="64"/>
+  <xd:arg xd:name="real_r_d1" xd:originalName="real_r_d1" xd:direction="out" xd:interfaceRef="real_r_d1" xd:busTypeRef="ap_memory" xd:arraySize="1024" xd:dataWidth="64"/>
+  <xd:arg xd:name="real_r_q1" xd:originalName="real_r_q1" xd:direction="in" xd:interfaceRef="real_r_q1" xd:busTypeRef="ap_memory" xd:arraySize="1024" xd:dataWidth="64"/>
+  <xd:arg xd:name="img_d0" xd:originalName="img_d0" xd:direction="out" xd:interfaceRef="img_d0" xd:busTypeRef="ap_memory" xd:arraySize="1024" xd:dataWidth="64"/>
+  <xd:arg xd:name="img_q0" xd:originalName="img_q0" xd:direction="in" xd:interfaceRef="img_q0" xd:busTypeRef="ap_memory" xd:arraySize="1024" xd:dataWidth="64"/>
+  <xd:arg xd:name="img_d1" xd:originalName="img_d1" xd:direction="out" xd:interfaceRef="img_d1" xd:busTypeRef="ap_memory" xd:arraySize="1024" xd:dataWidth="64"/>
+  <xd:arg xd:name="img_q1" xd:originalName="img_q1" xd:direction="in" xd:interfaceRef="img_q1" xd:busTypeRef="ap_memory" xd:arraySize="1024" xd:dataWidth="64"/>
+  <xd:arg xd:name="real_twid_q0" xd:originalName="real_twid_q0" xd:direction="in" xd:interfaceRef="real_twid_q0" xd:busTypeRef="ap_memory" xd:arraySize="512" xd:dataWidth="64"/>
+  <xd:arg xd:name="img_twid_q0" xd:originalName="img_twid_q0" xd:direction="in" xd:interfaceRef="img_twid_q0" xd:busTypeRef="ap_memory" xd:arraySize="512" xd:dataWidth="64"/>
+  <xd:latencyEstimates xd:best-case="51221" xd:worst-case="235541" xd:average-case="130581"/>
+  <xd:resourceEstimates xd:LUT="7601" xd:FF="4296" xd:BRAM="0" xd:DSP="56"/>
+</xd:acceleratorMap>

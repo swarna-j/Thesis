@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Webtalk v2016.4 (64-bit)
+# SW Build 1733598 on Wed Dec 14 22:35:42 MST 2016
+# IP Build 1731160 on Wed Dec 14 23:47:21 MST 2016
+# Start of session at: Mon Jun 12 17:47:41 2017
+# Process ID: 3132
+# Current directory: /home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog
+# Command line: wbtcv -mode batch -source /home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/xsim.dir/fft/webtalk/xsim_webtalk.tcl -notrace
+# Log file: /home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/webtalk.log
+# Journal file: /home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/webtalk.jou
+#-----------------------------------------------------------
+source /home/jsk_027/Thesis/machsuite_fft_workspace/solution1/sim/verilog/xsim.dir/fft/webtalk/xsim_webtalk.tcl -notrace

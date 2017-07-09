@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2016.4 (64-bit)
+# SW Build 1733598 on Wed Dec 14 22:35:42 MST 2016
+# IP Build 1731160 on Wed Dec 14 23:47:21 MST 2016
+# Start of session at: Tue Jun 13 09:34:23 2017
+# Process ID: 2800
+# Current directory: /home/jsk_027/Thesis/machsuite_fft_workspace/solution1/impl/ip
+# Command line: vivado -notrace -mode batch -source run_ippack.tcl
+# Log file: /home/jsk_027/Thesis/machsuite_fft_workspace/solution1/impl/ip/vivado.log
+# Journal file: /home/jsk_027/Thesis/machsuite_fft_workspace/solution1/impl/ip/vivado.jou
+#-----------------------------------------------------------
+source run_ippack.tcl -notrace
