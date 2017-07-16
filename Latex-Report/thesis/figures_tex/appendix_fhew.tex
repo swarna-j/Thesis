@@ -1,77 +1,10 @@
 \begin{table}[!h]
 \centering
-\caption{AXI-Stream Input-Output data handler}
-\label{fhewcode1:fft_stream}
-\begin{tabular}{l}
-\toprule
-\begin{lstlisting}[columns=fullflexible, language=C++,escapechar=\$]
-#include <hls_video.h> //for streaming data
-#include <ap_axi_sdata.h> //for defining channel attributes
-typedef ap_axiu<64,1,1,1> IOchannel; // <data, user, ID, destination>
-
-void handleFFT(hls::stream<IOchannel> &inStream, hls::stream<IOchannel> &outStream)
-{
-#pragma HLS INTERFACE axis port=inStream
-#pragma HLS INTERFACE axis port=outStream
-    IOchannel inChannel, outChannel;
-    complex_t input[2*N], output[N];
-    int idx;
-    for(idx = 0; idx < 2*N; idx++)
-    {
-    #pragma HLS PIPELINE
-        //Read and Cache Input channel value once (Block here if FIFO sender is empty)
-        inChannel = inStream.read();
-        input[idx].re = *((double*) (&inChannel.data));
-        inChannel = inStream.read();
-        input[idx].im = *((double*) (&inChannel.data));
-    }
-    FFT(input, output);
-    outChannel.keep = inChannel.keep;
-    outChannel.strb = inChannel.strb;
-    outChannel.user = inChannel.user;
-    outChannel.id   = inChannel.id;
-    outChannel.dest = inChannel.dest;
-    outChannel.last = 0;
-
-    for(idx = 0; idx < N-1; idx++)
-    {
-		outChannel.data = *((ap_uint<64> *)(&output[idx].re));
-		outStream.write(outChannel); //Reference: Vivado Design Suite User Guide
-		outChannel.data = *((ap_uint<64> *)(&output[idx].im));
-		outStream.write(outChannel);
-    }
-    outChannel.data = *((ap_uint<64> *)(&output[idx].re));
-    outStream.write(outChannel);
-    outChannel.data = *((ap_uint<64> *)(&output[idx].im));
-    outStream.write(outChannel);
-    outChannel.last = 1;
-}
-\end{lstlisting}
-\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[!h]
-\centering
 \caption{Non-recursive 1-D FFT}
-\label{fhewcode2:fft1}
+\label{fhewcode1:fft1}
 \begin{tabular}{l}
 \toprule
 \begin{lstlisting}[columns=fullflexible, language=C++,escapechar=\$]
-#include "fft.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <complex>
-
-#define PI 3.1415926535897932384626434
-#define N 1024
-typedef struct complex_t {
-    double re;
-    double im;
-} complex_t;
-
 void FFT(complex_t input[2*N], complex_t output[N])
 {
     int k, n;
@@ -124,7 +57,7 @@ void FFT(complex_t input[2*N], complex_t output[N])
 \begin{table}[!h]
 \centering
 \caption{Radix-2 DIF FFT}
-\label{fhewcode3:CTfft}
+\label{fhewcode2:CTfft}
 \begin{tabular}{l}
 \toprule
 \begin{lstlisting}[columns=fullflexible, language=C++,escapechar=\$]

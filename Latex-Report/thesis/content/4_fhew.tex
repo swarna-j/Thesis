@@ -1,4 +1,4 @@
-\chapter{Hardware Acceleration using FPGA}
+\chapter{Hardware Acceleration of Fully Homomorphic Encryption}
 \label{ch4_fhew}
 
 \section{Fully Homomorphic Encryption Scheme}
@@ -120,6 +120,7 @@ HomNAND Test Count & Function & Number of function calls\\
 \end{table}
 The tabulated values are averages obtained from 5 runs of the application in each of the two cases, HomNAND Test for 0 and 1 rounds. The number of function calls is not deterministic but usually around a certain range, due to the random nature of input, secret and bootstrapping keys. Each HomNAND Test involves 3 HomNAND function calls in the implemented FHE design \cite{fhew_lib} \ref{table:sw_hotspots_fhe}. This is because the circuit under test is defined by: (\textbf{a} NAND \textbf{b}) NAND (\textbf{c} NAND \textbf{d}).
 \subsubsection{Dimensionality Analysis}
+\label{4_1_3_1}
 \begin{table}[]
 \centering
 \caption{Dimensionality Analysis (Section 6.2, \cite{ducas2015fhew})}
@@ -201,20 +202,9 @@ As our intention is reduction of bit-width, the experiments were based on single
 From the above experiments, we conclude that of the standard datatypes, \textbf{double} is the lowest allowable precision that preserves the homomorphic encryption functionality. \newline\newline
 FFTs can also be performed in integer domain using Number Theoretic Transform library (NTL) used in \cite{helib}. NTL involves convolution of 2 sequences modulo a prime number. Hence, the choice of modulus with respect to sequence length is restricted \cite{bhattacharya2004some}. FFTW has proved to be much more optimized and faster than the latter as stated in Section 6.3, \cite{ducas2015fhew}, which is why FHEW is an improvement over HELib \cite{shai_he} which uses NTL, in terms of Bootstrapping runtime. As the optimization objective is to improve run-time, FFT function can be hand-optimized for hardware acceleration and the functional correctness verified, by integrating with the existing software implementation.
 \subsubsection*{FFT Offload}
-Various FFT implementations were explored, intuitively optimized and their runtime performance was studied using High-level synthesis tools.
-Firstly, the Xilinx FFT IP Core \cite{logicore2012fast} was analyzed and its usage studied. It implements the Cooley Tukey (Radix-4 DIT) FFT and accepts input in full-precision fixed point, scaled fixed point and block floating point . Since double-precision inputs are not supported by this hard block, it is not an ideal candidate for our application's acceleration. Then, a Cooley Tukey FFT algorithm was implemented, of size N given by the product $N_1$.$N_2$ where $N_1$ naive DFTs, each of size $N_2$ were performed. 
-\begin{table}[htbp]
-\centering
-\caption{Execution time of unoptimized Cooley Tukey implementation with transform length N = 1024 in Avnet Zedboard Evaluation Platform}
-\label{tab:ct_fft_1}
-\begin{tabular}{|c|l|l|l|l|l|}
-\hline
-\textbf{N1} & 512 & 256 & 128 & 64 & 32 \\ \hline
-\textbf{N2} & 2 & 4 & 8 & 16 & 32 \\ \hline
-\textbf{Execution Time (s)} & 1.5 & 0.77 & 0.38 & 0.23 & 0.18 \\ \hline
-\end{tabular}
-\end{table}
-From Table \ref{tab:ct_fft_1}, we see that the execution time was in the order of seconds, irrespective of the values of $N_1$ and $N_2$. Thus, this implementation was further improved by doing loop and function optimizations, integrated to the FHEW code and the functional correctness was verified. Taking it further, a radix-2 butterfly DIF FFT logic was implemented. \newline \newline For these implementations to be synthesizable by the high-level synthesis tool, recursive calls and dynamic memory allocation were avoided and all pointers were made deterministic at compile time. Various optimization directives were intuitively chosen to offer improved runtime performance and the best optimization was identified. The pros and cons of all three implementations were studied to decide on which best suits our need.  
+Various FFT implementations were explored, intuitively optimized and their runtime performance was studied using High-level synthesis tools. 
+Firstly, the Xilinx FFT IP Core \cite{logicore2012fast} was analyzed and its usage studied. It implements the Cooley Tukey (Radix-4 DIT) FFT and accepts inputs in full-precision fixed point, scaled fixed point and block floating point. Since double-precision inputs are not supported by this hard block, it is not an ideal candidate for our application's acceleration. Following this, two FFT codes were written, one performing simple 1D FFT and another, a simplified Radix-2 Butterfly (Cooley Tukey) DIF FFT implementation of size N, given by the product $N_1$.$N_2$ where $N_1$ naive DFTs, each of size $N_2$ were performed. 
+Thus, these implementations were analyzed and intuitively improved by doing loop and function optimizations, integrated to the FHEW code and the functional correctness was verified. \newline For these implementations to be synthesizable by the high-level synthesis tool, recursive calls and dynamic memory allocation were avoided and all pointers were made deterministic at compile time. The pros and cons of all three implementations were studied to decide on which best suits our requirement and the code giving the best runtime performance was identified.
 \subsubsection{Hand-optimized non-recursive 1-D FFT}
 Table \ref{tab: dse_1dfft} illustrates the clock period, latency and utilization estimates upon applying different optimization directives to the hand-optimized FFT implementation for hardware. We observe that solution 4 offers the most optimal area-latency design point. 
 \newcolumntype{L}{>{\centering\arraybackslash}p{{0.15\linewidth}}}
@@ -226,7 +216,7 @@ Table \ref{tab: dse_1dfft} illustrates the clock period, latency and utilization
 \hline
 \multicolumn{7}{|c|}{\textbf{Target: Avnet Zedboard Evaluation xc7z020clg484-1}} \\ \hline
 \multicolumn{2}{|l|}{} & \textbf{Solution 1} & \textbf{Solution 2} & \textbf{Solution 3} & \textbf{Solution 4} & \textbf{Solution 5} \\ \hline
-\multicolumn{2}{|c|}{\textbf{Optimization}} & No directives. & Loop 0: Pipeline& Loop 0: Unroll & Loop 0 \& 2: Pipeline & Loop 0: Pipeline, Loop 2: Unroll \\ \hline
+\multicolumn{2}{|c|}{\textbf{Optimization}} & \textit{No directives.} & Loop 0: \textit{Pipeline}& Loop 0: \textit{Unroll} & Loop 0 \& 2: \textit{Pipeline} & Loop 0: \textit{Pipeline}, Loop 2: \textit{Unroll} \\ \hline
 \multicolumn{2}{|c|}{\textbf{\begin{tabular}[c]{@{}c@{}}Estimated\\Clock Period\\(ns)\end{tabular}}} & 9.83 & 9.83 & 12.93 & 11.96 & 12.19 \\ \hline
 \multirow{2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Latency\\ (cycles)\end{tabular}}} & \textbf{Min} & 295730178 & 295705626 & 297810991 & 5387290 & 8048665 \\ \cline{2-7} 
  & \textbf{Max} & 945847298 & 945822746 & 947928111 & 5387290 & 12492825 \\ \hline
@@ -236,250 +226,101 @@ Table \ref{tab: dse_1dfft} illustrates the clock period, latency and utilization
  & \textbf{LUT} & 24133 & 26896 & 117748 & 70551 & 19331620 \\ \hline
 \end{tabular}
 \end{table}
-
-\begin{tikzpicture}
-\label{graph:dse_1dfft}
-\centering
-	\begin{axis}[
-		xlabel= Average Latency (cycles),
-		ylabel=Area (resources),     
-        nodes near coords, % Place nodes near each coordinate
-    point meta=explicit symbolic, % The meta data used in the nodes is not explicitly provided and not numeric
-	    title={\texttt{Design Space Exploration for non-recursive 1-D FFT}}]        
-	\addplot[mark=triangle*, only marks, mark options={fill=black}] 
-    table [% Provide data as a table
-     meta index=2 % the meta data is found in the third column
-     ] {
-   x          y     label
-945847298    31448    1
-945822746    35227    2
-947928111   267088    3
-5387290     102972    4
-12492825  24008520    5
-	};
-	\end{axis}
-\end{tikzpicture}
-
-\begin{tikzpicture}
-\begin{axis}[
-    title={Resource Utilization with different optimization directives},
-    xlabel={Resource Type},
-    ylabel={Number of Resources},
-    xtick=data,    
-    legend pos=north west,
-    ymajorgrids=true,
-    grid style=dashed, 
-    symbolic x coords={BRAM, DSP48E, LUT, FF},
-]
- 
-\addplot[
-    mark=*, mark options={fill=white}, color = red
-    ]
-    coordinates {
-    (BRAM,13)
-    (DSP48E,67)
-    (LUT,24133)
-    (FF,7235)
-    };   
-
-\addplot[
-    mark=triangle*, mark options={fill=white}, color = green
-    ]
-    coordinates {
-    (BRAM,13)
-    (DSP48E,73)
-    (LUT,26896)
-    (FF,8245)
-    };    
-    
-\addplot[
-    mark=square*, mark options={fill=white}, color = blue
-    ]
-    coordinates {
-    (BRAM,13)
-    (DSP48E,234)
-    (LUT,117748)
-    (FF,149093)
-    };    
-    
-\addplot[
-    mark=square*, mark options={fill=brown}, color = brown
-    ]
-    coordinates {
-    (BRAM,8)
-    (DSP48E,105)
-    (LUT,70551)
-    (FF,32308)
-    };    
-\end{axis}    
-    \begin{scope}[shift={(1,3)}] 
-	\draw (0,0) -- 
-		plot[mark=*, mark options={fill=white}, color=red] (0.25,0) -- (0.5,0) 
-		node[right]{Solution 1};
-	\draw[yshift=\baselineskip] (0,0) -- 
-		plot[mark=triangle*, mark options={fill=white}, color=green] (0.25,0) -- (0.5,0)
-		node[right]{Solution 2};
-	\draw[yshift=2\baselineskip] (0,0) -- 
-		plot[mark=square*, mark options={fill=white}, color=blue] (0.25,0) -- (0.5,0)
-		node[right]{Solution 3};
-	\draw[yshift=3\baselineskip] (0,0) -- 
-		plot[mark=square*, mark options={fill=brown}, color = brown] (0.25,0) -- (0.5,0)
-		node[right]{Solution 4};
-	\end{scope}
-
-\end{tikzpicture}
-
-\subsubsection{Cooley Tuckey Radix-2 DIF FFT}
-DIF FFT takes inputs in bit-reversed order and produces outputs in natural order. Shift operators are used instead of the costly multipliers. This implementation is in-place to reduce migration costs and less intuitive, but better optimized for hardware. \newline\newline
-Appendix \ref{fhewcode3:CTfft} shows that some loop bounds are not statically defined. So, the HLS tool cannot determine the number of iterations of a variable-length loop at runtime and hence, cannot supply the latency estimates. To circumvent this problem, the directive "Loop Trip Count" is applied by manually specifying the maximum number of times this loop will be executed, at compile time.\newline\newline
-
-\begin{table}[htbp]
-\centering
-\caption{Design Space Exploration for Cooley Tukey Radix-2 DIF FFT}
-\label{tab:dse_ctfft}
-\begin{tabular}{|m{2cm}|m{1.5cm}|L|L|L|L|}
-\hline
-\multicolumn{6}{|c|}{\textbf{Target: Avnet Zedboard Evaluation xc7z020clg484-1}} \\ \hline
-\multicolumn{2}{|l|}{} & \textbf{Solution 1} & \textbf{Solution 2} & \textbf{Solution 3} & \textbf{Solution 4} \\ \hline
-\multicolumn{2}{|c|}{\textbf{Optimization}} & \begin{tabular}[c]{@{}c@{}}Loops 1,2:\\Trip\\Count \\= 512\end{tabular} & \begin{tabular}[c]{@{}c@{}}Loops 1,2:\\Trip\\Count \\= 512,\\Loop 3:\\Pipeline\end{tabular} & \begin{tabular}[c]{@{}c@{}}Loops 1,2:\\Trip\\Count \\= 512,\\ Loop 3:\\Unroll\end{tabular} & \begin{tabular}[c]{@{}c@{}}Loops 1,2:\\Trip\\Count \\= 512,\\ Loop 3:\\Unroll\\(factor 16)\end{tabular} \\ \hline
-\multicolumn{2}{|c|}{\textbf{Estimated Clock Period}} & 8.23 & 8.23 & 8.23 & 8.23 \\ \hline
-\multirow{2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Latency\\ (cycles)\end{tabular}}} & \textbf{Min} & 2170 & 3195 & 1112 & 1210 \\ \cline{2-6} 
- & \textbf{Max} & 49871994 & 49871995 & 49869912 & 49871994 \\ \hline
-\multirow{4}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Utilization\\ Estimates\end{tabular}}} & \textbf{BRAM\_18K} & 0 & 0 & 0 & 0 \\ \cline{2-6} 
- & \textbf{DSP48E} & 56 & 56 & 56 & 56 \\ \cline{2-6} 
- & \textbf{FF} & 4511 & 4513 & 131834 & 6996 \\ \cline{2-6} 
- & \textbf{LUT} & 8529 & 8529 & 67506 & 9932 \\ \hline
-\end{tabular}
-\end{table}
-
-\begin{tikzpicture}
-\begin{axis}[
-    title={Resource Utilization with different optimization directives},
-    xlabel={Resource Type},
-    ylabel={Number of Resources},
-    xtick=data,    
-    legend pos=north west,
-    ymajorgrids=true,
-    grid style=dashed, 
-    symbolic x coords={BRAM, DSP48E, LUT, FF},
-]
- 
-\addplot[
-    mark=*, mark options={fill=white}, color = red
-    ]
-    coordinates {
-    (BRAM,0)
-    (DSP48E,56)
-    (LUT,8529)
-    (FF,4511)
-    };   
-
-\addplot[
-    mark=triangle*, mark options={fill=white}, color = green
-    ]
-    coordinates {
-    (BRAM,0)
-    (DSP48E,56)
-    (LUT,8529)
-    (FF,4513)
-    };    
-    
-\addplot[
-    mark=square*, mark options={fill=white}, color = blue
-    ]
-    coordinates {
-    (BRAM,0)
-    (DSP48E,56)
-    (LUT,67506)
-    (FF,131834)
-    };    
-    
-\addplot[
-    mark=square*, mark options={fill=brown}, color = brown
-    ]
-    coordinates {
-    (BRAM,0)
-    (DSP48E,56)
-    (LUT,9932)
-    (FF,6996)
-    };    
-\end{axis}    
-    \begin{scope}[shift={(1,3)}] 
-	\draw (0,0) -- 
-		plot[mark=*, mark options={fill=white}, color=red] (0.25,0) -- (0.5,0) 
-		node[right]{Solution 1};
-	\draw[yshift=\baselineskip] (0,0) -- 
-		plot[mark=triangle*, mark options={fill=white}, color=green] (0.25,0) -- (0.5,0)
-		node[right]{Solution 2};
-	\draw[yshift=2\baselineskip] (0,0) -- 
-		plot[mark=square*, mark options={fill=white}, color=blue] (0.25,0) -- (0.5,0)
-		node[right]{Solution 3};
-	\draw[yshift=3\baselineskip] (0,0) -- 
-		plot[mark=square*, mark options={fill=brown}, color = brown] (0.25,0) -- (0.5,0)
-		node[right]{Solution 4};
-	\end{scope}
-
-\end{tikzpicture}
-
-\begin{tikzpicture}
-\label{graph:dse_CTfft}
-\centering
-	\begin{axis}[
-		xlabel=Average Latency (cycles),
-		ylabel=Area (resources),     
-        nodes near coords, % Place nodes near each coordinate
-    point meta=explicit symbolic, % The meta data used in the nodes is not explicitly provided and not numeric
-	    title={\texttt{Design Space Exploration for Cooley Tukey Radix-2 DIF FFT}}]        
-	\addplot[mark=triangle*, only marks, mark options={fill=black}] 
-    table [% Provide data as a table
-     meta index=2 % the meta data is found in the third column
-     ] {
-   x          y     label
-24937082	13096    1
-24937595	13098    2
-24935512	199396   3
-24936602	16984    4
-	};
-	\end{axis}
-\end{tikzpicture}
-\newline From the plot \ref{graph:dse_CTfft}, we see that solution 3 gives the best case latency. However, there are not enough LUTs in the target board to implement this design. Hence, optimizations of solution 4 are more appropriate for a practical best-case latency scenario. 
+However, in a broader perspective, we get the estimated execution time as 5387290 x 11.96 ns = 64 ms, by calculating the product of estimated clock period and minimum latency. This is an impractical choice, spanning several clock cycles and we want our whole FHEW library to execute in the order of a few milliseconds, .
 \newcolumntype{C}{>{\centering\arraybackslash}p{{0.25\linewidth}}}
 \subsubsection{MachSuite FFT}
 MachSuite is a collection of 19 diverse application benchmarks, which are high-level synthesizable. FFT algorithm which is one of the benchmark applications is explored to decide whether it meets our requirement.
 \begin{table}[htbp]
 \centering
-\caption{Design Space Exploration for Machsuite FFT}
+\caption{Pre-implementation Design space exploration for Machsuite FFT}
 \label{tab:dse_machsuite}
-\begin{tabular}{|m{2cm}|m{1.5cm}|m{3cm}|m{3cm}|}
+\begin{tabular}{|m{2cm}|m{1.5cm}|m{3.25cm}|m{3.25cm}|}
 \hline
 \multicolumn{4}{|c|}{\textbf{Target: Avnet Zedboard Evaluation xc7z020clg484-1}} \\ \hline
 \multicolumn{2}{|c|}{} & \textbf{Solution 1} & \textbf{Solution 2}\\ 
 \hline
-\multicolumn{2}{|c|}{\textbf{Optimization}} & \begin{tabular}[c]{@{}c@{}}Loop 0: Trip\\Count = 10,\\Loop 1: Trip\\Count = 1024\end{tabular} & \begin{tabular}[c]{@{}c@{}}Loops 1,2:\\Trip Count=512,\\Loop 3:\\Pipeline\end{tabular} \\ \hline
-\multicolumn{2}{|c|}{\textbf{Estimated Clock Period}} & \makecell[c]{8.23} & \makecell[c]{8.23} \\ \hline
-\multirow{2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Latency\\ (cycles)\end{tabular}}} & \textbf{Min} & \makecell[c]{2170} & \makecell[c]{3195} \\ \cline{2-4} 
- & \textbf{Max} & \makecell[c]{49871994} & \makecell[c]{49871995} \\ \hline
+\multicolumn{2}{|c|}{\textbf{Optimization}} & \begin{tabular}[c]{@{}c@{}}Loop 0: \textit{Trip}\\\textit{Count = 10,}\\Loop 1: \textit{Trip}\\\textit{Count = 512}\end{tabular} & \begin{tabular}[c]{@{}c@{}}Loop 0: \textit{Trip}\\\textit{Count = 10,}\\Loop 1: \textit{Trip}\\\textit{Count = 512}\\ \textit{BRAM to store}\\\textit{inputs and}\\\textit{twiddle factors}\end{tabular} \\ \hline
+\multicolumn{2}{|c|}{\textbf{Estimated Clock Period}} & \makecell[c]{8.23} & \makecell[c]{8.23} \\\hline
+\multirow{2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Latency\\ (cycles)\end{tabular}}} & \textbf{Min} & \makecell[c]{21} & \makecell[c]{21} \\ \cline{2-4} 
+ & \textbf{Max} & \makecell[c]{117781} & \makecell[c]{122901} \\ \hline
 \multirow{4}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Utilization\\ Estimates\end{tabular}}} & \textbf{BRAM\_18K} & \makecell[c]{0} & \makecell[c]{0} \\ \cline{2-4} 
  & \textbf{DSP48E} & \makecell[c]{56} & \makecell[c]{56} \\ \cline{2-4} 
- & \textbf{FF} & \makecell[c]{4511} & \makecell[c]{4513} \\ \cline{2-4} 
- & \textbf{LUT} & \makecell[c]{8529} & \makecell[c]{8529} \\ \hline
+ & \textbf{FF} & \makecell[c]{4285} & \makecell[c]{4286} \\ \cline{2-4} 
+ & \textbf{LUT} & \makecell[c]{7578} & \makecell[c]{7558} \\ \hline
+\end{tabular}
+\end{table}
+We observe that this benchmark implementation is already well-optimized and application of compiler directives offers no gain in latency. Following the co-simulation and RTL export steps for this benchmark code in HLS, Runtime Simulation of resultant IP cores is performed in Vivado Design Suite and the respective execution times are tabulated in Table \ref{tab:mach_postimpl}. We see that for this algorithm, the best-case latency is obtained without any directive. This is consistent with the notion that the choice of directives is crucial and dependent on the implementation, and mindless application of optimization directives doesn't always guarantee improved performance.
+\begin{table}[]
+\centering
+\caption{Post-implementation execution time for MachSuite benchmark FFT}
+\label{tab:mach_postimpl}
+\begin{tabular}{|l|l|l|ll}
+\cline{1-3}
+ & \textbf{Solution 1} & \textbf{Solution 2} &  &  \\ \cline{1-3}
+\textbf{Achievable clock period (ns)} & \makecell[c]{9.87} & \makecell[c]{9.612} \\ \cline{1-3}
+\textbf{Latency (cycles)} & \makecell[c]{104482} & \makecell[c]{109602}\\ \cline{1-3}
+\textbf{Execution Time} & \makecell[c]{1.031 ms} & \makecell[c]{1.053 ms}\\ \cline{1-3}
+\end{tabular}
+\end{table}
+\subsubsection{Cooley Tuckey Radix-2 DIF FFT}
+DIF FFT takes inputs in bit-reversed order and produces outputs in natural order. Shift operators are used instead of the costly multipliers. This implementation is in-place to reduce migration costs and less intuitive, but better optimized for hardware.
+
+\begin{table}[htbp]
+\centering
+\caption{Pre-implementation Design Space Exploration for Radix 2 DIF-FFT}
+\label{tab: dse_RAD2}
+\begin{tabular}{|m{2cm}|m{1.5cm}|L|L|L|L|}
+\hline
+\multicolumn{6}{|c|}{\textbf{Target: Avnet Zedboard Evaluation xc7z020clg484-1}} \\ \hline
+\multicolumn{2}{|l|}{} & \textbf{Solution 1} & \textbf{Solution 2} & \textbf{Solution 3} & \textbf{Solution 4} \\ \hline
+\multicolumn{2}{|c|}{\textbf{Optimization}} & \begin{tabular}[c]{@{}c@{}}Loop 1:\\ \textit{Trip count }\\\textit{= 512,}\\Loop 2:\\\textit{Trip count}\\ \textit{= 2}\end{tabular} & \begin{tabular}[c]{@{}c@{}}Loop 1:\\ \textit{Trip count }\\\textit{= 512,}\\Loop 2:\\\textit{Trip count}\\ \textit{= 2,}\\Loop 3:\\\textit{Pipeline}\end{tabular} & \begin{tabular}[c]{@{}c@{}}Loop 1:\\ \textit{Trip count }\\\textit{= 512,}\\Loop 2:\\\textit{Trip count}\\ \textit{= 2,}\\Loop 3:\\\textit{Unroll}\\\textit{(factor 16)}\end{tabular} & \begin{tabular}[c]{@{}c@{}}Loop 1:\\ \textit{Trip count }\\\textit{= 512,}\\Loop 2:\\\textit{Trip count}\\ \textit{= 2,}\\Loop 3:\\\textit{Unroll}\end{tabular} \\ \hline
+\multicolumn{2}{|c|}{\textbf{\begin{tabular}[c]{@{}c@{}}Estimated \\Clock Period (ns)\end{tabular}}} & 8.23 & 8.23 & 8.23 & 8.23 \\ \hline
+\multirow{2}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Latency\\ (cycles)\end{tabular}}} & \textbf{Min} & 2170 & 3195 & 1210 & 1112\\ \cline{2-6} 
+ & \textbf{Max} & 259194 & 259195 & 259194 & 257112 \\ \hline
+\multirow{4}{*}{\textbf{\begin{tabular}[c]{@{}c@{}}Utilization\\ Estimates\end{tabular}}} & \textbf{BRAM} & 0 & 0 & 0 & 0 \\ \cline{2-6} 
+ & \textbf{DSP48E} & 56 & 56 & 56 & 56 \\ \cline{2-6} 
+ & \textbf{FF} & 4513 & 4515 & 7004 & 131824 \\ \cline{2-6} 
+ & \textbf{LUT} & 8532 & 8532 & 9911 & 67505 \\ \hline
+\end{tabular}
+\end{table}
+
+Appendix \ref{fhewcode2:CTfft} shows that some loop bounds are not statically defined. So, the HLS tool cannot determine the number of iterations of a variable-length loop at runtime and hence, cannot supply the latency estimates. To circumvent this problem, the directive "Loop Trip Count" is applied by manually specifying the maximum number of times this loop will be executed, at compile time.
+
+\begin{figure}[h!]
+ \centering
+ \includegraphics[width=0.8\linewidth]{figures/DSE_Butterfly.PNG}
+ \caption{Area vs. Latency plot for Radix-2 DIF FFT}
+ \label{fig:presyn_RAD2}
+\end{figure}
+
+From the plot \ref{fig:presyn_RAD2}, we see that solution 4 gives the best case latency. However, this design requires 124\% of LUTs and 132\% of FFs available in the board. As there are not enough LUTs to do a complete unroll of the loop 3, we choose an unroll factor of 16, which is more practical to realize and also offers a good speed (solution 3). 
+\begin{figure}[h!]
+ \centering
+ \includegraphics[width=0.75\linewidth]{figures/Butterfly_ResourceUtil.PNG}
+ \caption{Post-implementation resource utilization summary for Radix-2 DIF FFT}
+ \label{fig:area_butterfly}
+\end{figure}
+From Figure \ref{fig:area_butterfly}, we also observe that solution 3 also has a higher resource utilization than solutions 1 and 2. Hence, it can be concluded that solution 3 offers the practical best-case execution time compared to other solutions in Table \ref{tab: dse_RAD2}.
+
+\begin{table}[htbp]
+\centering
+\caption{Post-implementation execution time for Radix-2 DIF FFT}
+\label{tab:dse_bfft}
+\begin{tabular}{|m{2.5cm}|L|L|L|L|}
+\hline
+& \textbf{Solution 1} & \textbf{Solution 2} & \textbf{Solution 3} & \textbf{Solution 4} \\ \hline
+{\textbf{Achievable Clock Period (ns)}} & 9.597 & 9.603 & 9.445 & - \\ \hline
+\textbf{Latency (cycles)}&112222& 112751&111757&110668\\ 
+\hline
+\textbf{Execution Time}&1.076 ms& 1.08 ms&1.055 ms&Place design error\\ 
+\hline
 \end{tabular}
 \end{table}
 
 \subsubsection{Comparison of Execution Times}
-\begin{table}[htbp]
-\centering
-\caption{Estimates of execution time in different FFT algorithms}
-\label{tab:compare_fft}
-\begin{tabular}{|m{0.2\linewidth}|m{0.25\linewidth}|m{0.25\linewidth}|m{0.25\linewidth}|}
-\hline
- & \textbf{\makecell[c]{Non-recursive\\1-D FFT}} & \textbf{\makecell[c]{Radix-2\\DIF FFT}} &\textbf{MachSuite FFT}\\ \hline
-\textbf{Best-case Execution Time} & 5387290 x 11.96 ns = 0.064 s & 1210 x 8.23 ns = 9.95 $\mu$s & 2170 X 8.23 ns = 17 $\mu$s \\ \hline
-\end{tabular}
-\end{table}
-
-The execution time in Table \ref{tab:compare_fft} is calculated as the product of number of cycles and clock period. In Non-recursive 1-D FFT, execution time is of the order of a few milliseconds. As our application demands speed in the range of microseconds for gain over software implementation, Radix-2 FFT proves to be the optimal choice. \newline
+The FFTW library calculates FFT in software in about 30 $\mu$s, on an average. However, the execution time could go up based on the nature of inputs to the library. As a first step, FFTW is replaced by a handwritten FFT logic successfully and its functional correctness verified. After replacing, it is observed that a single FFT takes around 0.13 seconds in software, which is very high. An algorithmic exploration is performed for a given Zynq Architecture. The MachSuite benchmark takes about 1.03ms whereas butterfly DIF FFT (solution 3) takes about 1.055ms. Although this is still not comparable to the benchmark performance of FFTW library, a much superior performance is expected once other blocks of AddToAcc are understood and completely ported, allowing for the concurrent execution of several hardware blocks. Using high-speed streaming DMA Transfers from high performance ports of Zynq Processing system to Programmable logic via AXI Interface can help reduce the communication overhead of the system. 
 \begin{adjustwidth}{2cm}{}
-The ratio $R_{acceleration}$ = $\frac{t_{sw}}{t_{hw}}$ = $\frac{30.892}{9.95}$ = 3.1047\newline 
+The ratio $R_{acceleration}$ = $\frac{t_{sw}}{t_{hw}}$ \\ \\= $\frac{0.13 s}{1.03 ms}$ = 126.2 times for MachSuite benchmark\newline 
+= $\frac{0.13 s}{1.055 ms}$ = 123.2 times for Radix-2 butterfly FFT\newline
 \end{adjustwidth} 
-High-speed Streaming DMA Transfers from high performance ports of Zynq Processing system to Programmable logic via AXI Interface assure that the communication overhead is less. By using higher FPGA generations such as Virtex 7, a much higher speedup can be obtained and unroll factor increased. 
+Alternatively, an architectural exploration can also be performed and higher hardware generations having enough resources can be identified, to allow bigger unroll factors and a much higher throughput. For example, Virtex 7 board is usually faster that the Zynq Zedboard and has more resources giving the freedom to use more suitable compiler optimizations.

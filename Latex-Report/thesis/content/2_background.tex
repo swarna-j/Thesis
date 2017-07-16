@@ -8,14 +8,14 @@ Migration of some applications running on a general purpose CPU, to custom hardw
 \item Repeated routines on different data sets,
 \item Other parallelizable tasks, etc. 
 \end{itemize}
-Some common real-world scenarios demanding the computation bandwidth of hardware accelerators are Audio codec applications, high-speed Video Streaming, Network protocols, Cryptanalysis, Data mining, Natural Language Processing, Computer Vision, etc. \cite{ibm_devworks} The goal is to accomplish a faster execution time in hardware than in software. The hardware execution time includes the actual computation time by the accelerator as well as the communication overheads associated with reading and writing back the data. 
+Some common real-world scenarios demanding the computation bandwidth of hardware accelerators are Audio Codec applications, high-speed Video Streaming, Network protocols, Cryptanalysis, Data mining, Natural Language Processing, Computer Vision, etc. \cite{ibm_devworks} The goal is to accomplish a faster execution time in hardware than in software. The hardware execution time includes the actual computation time by the accelerator as well as the communication overheads associated with reading and writing back the data. 
 
 \section{Heterogeneous Platforms}
 \label{sect2_2}
 Heterogeneous computing platform constitutes different kinds of processors on the same silicon die. Commonly found constituents of an embedded system platform are a general-purpose processor (CPU) and a few specialized co-processors designed for a specific purpose. Examples of co-processors are Digital Signal Processors, which provide Instruction Level parallelism with VLIW, SIMD and superscalar capabilities, GPGPUs and FPGAs. The heterogeneous devices that were used for this project are listed below:
 \subsection{Intel Platform with CPU and GPU}
-This platform has been chosen to demonstrate code portability across different compute elements, evaluate the runtime of an application in CPU and GPU, analyze whether the given application is control-bound or compute-bound, and estimate the percentage improvement in latency. The \textbf{Intel SDK for OpenCL}\cite{intel_openclSDK} is available for both Windows and Linux Operating Systems and offers packages to run applications on Intel CPU and GPU. Also, the \textbf{OpenCL Runtime Environment} (RTE) \cite{intel_runtime} provides drivers and library packages required to test applications while they are running. The installation of these packages will be discussed in detail in Section \ref{3_1_3_1}.   
-\subsection{Avnet Zedboard with Xilinx Zynq 7000\\All-programmable SoC}
+This platform has been chosen to demonstrate code portability, analyze whether the given application is control-bound or compute-bound, evaluate the application runtime in CPU and GPU, and estimate the improvement in latency. The \textbf{Intel SDK for OpenCL}\cite{intel_openclSDK} is available for both Windows and Linux Operating Systems and offers packages to run applications on Intel CPU and GPU. Also, the \textbf{OpenCL Runtime Environment} (RTE) \cite{intel_runtime} provides drivers and library packages required to test applications while they are running. The installation of these packages will be discussed in detail in Section \ref{3_1_3_1}.   
+\subsection{Avnet Zedboard with Xilinx Zynq 7000}
 This platform comprises of a Processing System with dual-core ARM Cortex A9, running at 667 MHz with NEON SIMD engine and Floating Point Unit, and a Programmable Logic with Artix-7 FPGA. The processing system and programmable logic are connected via AXI Interface. Zedboard has found its place in different market segments, be it Automotive, Consumer Electronics, software-defined Radio applications \cite{dobson2014architecture}, Aerospace and Defense, Medical diagnostics and Imaging, Wired and Wireless communication, Control and Bridging applications \cite{xil_zynqbrief}. Owing to its versatility, this platform has been chosen to conduct experiments on the complex applications at hand.
 \section{Programming Models for Hardware Acceleration}
 \label{2_3}
@@ -36,7 +36,7 @@ There are three popular OpenCL Models \cite{opencl_ajg}, which shall be discusse
 \subsubsection{Device Model}
 \label{2_3_1_1}
 It is an abstract view of various components in a Compute device. 
-Each device consists of various Compute Units, and each of those compute units are composed of several Processing Elements (PEs). 
+Each device consists of various Compute Units, and each of those units are composed of several Processing Elements (PEs). 
 Hence, Compute units can be viewed as containers of very simple processors (PEs). 
 
 \begin{figure}[h!]
@@ -58,7 +58,7 @@ It defines the memory hierarchy inside an OpenCL device.
 \end{itemize}
 \subsubsection{Execution Model}
 \label{2_3_1_3}
-OpenCL \textbf{kernels} are ordinary functions with special signatures written in OpenCL C, which run on each Processing Element. For data-parallel applications where the same function is invoked several times, the kernels execute in parallel on different PEs over a pre-defined N-dimensional index space \cite{tompson2012introduction}. \newline \newline
+OpenCL \textbf{kernels} are ordinary functions with special signatures written in OpenCL C, which run on each Processing Element. For data-parallel applications where the same function is invoked several times, the kernels execute concurrently on different PEs over a pre-defined N-dimensional index space \cite{tompson2012introduction}. \newline \newline
 A \textbf{work item} is an independent element of execution. It can also be interpreted as the invocation of the kernel for a specific index “i”. The \textbf{global work size} defines the number of work items per work dimension (dimension of the index space).\newline \newline
 The host describes an N-dimensional computational load where each index point is represented by a work item. The work items are grouped into \textbf{work groups} by the host and each of these work groups execute in parallel within the compute unit. The work group size is device-dependent and can be found by querying the device using OpenCL APIs. 
 Each Compute Unit has its own work-group(s) and each work item in the work group is executed by a single processing element.
@@ -109,4 +109,4 @@ In conventional RTL design, the designers should handle cycle-wise hardware desc
   \label{fig:pipeline_parallelism_fpga_opencl}
 \end{figure}
 Figure \ref{fig:pipeline_parallelism_fpga_opencl} depicts the pipelined execution of the 8 threads by the generated circuit. Assuming there are three pipeline stages, at cycle 3, we observe that thread 0 stores the computed result, thread 1 computes the sum for a new set of data values, thread 2 copies the values read from memory while thread 3 reads data from the memory. Thus, at any point during the execution, all pipeline stages manipulate a different thread and all stages of the pipeline are active, until the processing of all threads are complete. \newline \newline
-Some FPGA vendors like Xilinx and Altera offer OpenCL SDKs for FPGAs. We are not using the Altera Toolchain for our experiments, but the benchmark code taken for test relies on some platform-independent C++ headers (aocl\_utils) and Quartus II Emulator that are available with this SDK. Hence, this thesis shall make use of Altera OpenCL (AOCL) SDK to analyze and modify the code and study the results.
+Some FPGA vendors like Xilinx and Altera offer OpenCL SDKs for FPGAs. We are not using the Altera Toolchain for our experiments, but the benchmark code taken for test relies on some platform-independent C++ headers (aocl\_utils) and Quartus II Emulator that are available with this SDK. Hence, this thesis shall make use of Altera OpenCL (AOCL) SDK to analyze, modify the code and study the results.

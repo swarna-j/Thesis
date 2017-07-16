@@ -1,0 +1,52 @@
+\BOOKMARK [0][-]{chapter.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.1.1}{Motivation}{chapter.1}% 2
+\BOOKMARK [1][-]{section.1.2}{Contribution}{chapter.1}% 3
+\BOOKMARK [1][-]{section.1.3}{Organization}{chapter.1}% 4
+\BOOKMARK [0][-]{chapter.2}{Background}{}% 5
+\BOOKMARK [1][-]{section.2.1}{What is Hardware Acceleration?}{chapter.2}% 6
+\BOOKMARK [1][-]{section.2.2}{Heterogeneous Platforms}{chapter.2}% 7
+\BOOKMARK [2][-]{subsection.2.2.1}{Intel Platform with CPU and GPU}{section.2.2}% 8
+\BOOKMARK [2][-]{subsection.2.2.2}{Avnet Zedboard with Xilinx Zynq 7000}{section.2.2}% 9
+\BOOKMARK [1][-]{section.2.3}{Programming Models for Hardware Acceleration}{chapter.2}% 10
+\BOOKMARK [2][-]{subsection.2.3.1}{GPGPUs}{section.2.3}% 11
+\BOOKMARK [3][-]{subsubsection.2.3.1.1}{Device Model}{subsection.2.3.1}% 12
+\BOOKMARK [3][-]{subsubsection.2.3.1.2}{Memory Model}{subsection.2.3.1}% 13
+\BOOKMARK [3][-]{subsubsection.2.3.1.3}{Execution Model}{subsection.2.3.1}% 14
+\BOOKMARK [2][-]{subsection.2.3.2}{Field Programmable Gate Arrays}{section.2.3}% 15
+\BOOKMARK [3][-]{subsubsection.2.3.2.1}{High-Level Synthesis}{subsection.2.3.2}% 16
+\BOOKMARK [3][-]{subsubsection.2.3.2.2}{OpenCL}{subsection.2.3.2}% 17
+\BOOKMARK [0][-]{chapter.3}{Hardware Acceleration of Convolutional Neural Networks}{}% 18
+\BOOKMARK [1][-]{section.3.1}{Deep Learning using Convolutional Neural Networks}{chapter.3}% 19
+\BOOKMARK [2][-]{subsection.3.1.1}{MNIST Digit Recognition using Lenet-5 ConvNet}{section.3.1}% 20
+\BOOKMARK [3][-]{subsubsection.3.1.1.1}{Convolution Layer cnnak}{subsection.3.1.1}% 21
+\BOOKMARK [3][-]{subsubsection.3.1.1.2}{MaxPool Layer}{subsection.3.1.1}% 22
+\BOOKMARK [3][-]{subsubsection.3.1.1.3}{Inner Product Layer}{subsection.3.1.1}% 23
+\BOOKMARK [3][-]{subsubsection.3.1.1.4}{ReLU Layer}{subsection.3.1.1}% 24
+\BOOKMARK [3][-]{subsubsection.3.1.1.5}{Softmax Layer}{subsection.3.1.1}% 25
+\BOOKMARK [3][-]{subsubsection.3.1.1.6}{Modified Hyperparameters for MNIST Dataset}{subsection.3.1.1}% 26
+\BOOKMARK [2][-]{subsection.3.1.2}{Experiments with C++ Code}{section.3.1}% 27
+\BOOKMARK [3][-]{subsubsection.3.1.2.1}{Prerequisites}{subsection.3.1.2}% 28
+\BOOKMARK [3][-]{subsubsection.3.1.2.2}{Existing Code Flow Description}{subsection.3.1.2}% 29
+\BOOKMARK [3][-]{subsubsection.3.1.2.3}{Improvements}{subsection.3.1.2}% 30
+\BOOKMARK [2][-]{subsection.3.1.3}{Experiments with OpenCL Code}{section.3.1}% 31
+\BOOKMARK [3][-]{subsubsection.3.1.3.1}{Pre-requisites}{subsection.3.1.3}% 32
+\BOOKMARK [3][-]{subsubsection.3.1.3.2}{Existing Code Flow Description}{subsection.3.1.3}% 33
+\BOOKMARK [3][-]{subsubsection.3.1.3.3}{Modifications to remove Platform Dependencies}{subsection.3.1.3}% 34
+\BOOKMARK [3][-]{subsubsection.3.1.3.4}{Compiling and executing the code}{subsection.3.1.3}% 35
+\BOOKMARK [2][-]{subsection.3.1.4}{Comparative Study of Results}{section.3.1}% 36
+\BOOKMARK [0][-]{chapter.4}{Hardware Acceleration of Fully Homomorphic Encryption}{}% 37
+\BOOKMARK [1][-]{section.4.1}{Fully Homomorphic Encryption Scheme}{chapter.4}% 38
+\BOOKMARK [2][-]{subsection.4.1.1}{Background}{section.4.1}% 39
+\BOOKMARK [2][-]{subsection.4.1.2}{Existing code flow}{section.4.1}% 40
+\BOOKMARK [2][-]{subsection.4.1.3}{Hot-Spots for Hardware Acceleration}{section.4.1}% 41
+\BOOKMARK [3][-]{subsubsection.4.1.3.1}{Dimensionality Analysis}{subsection.4.1.3}% 42
+\BOOKMARK [2][-]{subsection.4.1.4}{Results}{section.4.1}% 43
+\BOOKMARK [3][-]{subsubsection.4.1.4.1}{Hand-optimized non-recursive 1-D FFT}{subsection.4.1.4}% 44
+\BOOKMARK [3][-]{subsubsection.4.1.4.2}{Cooley Tuckey Radix-2 DIF FFT}{subsection.4.1.4}% 45
+\BOOKMARK [3][-]{subsubsection.4.1.4.3}{MachSuite FFT}{subsection.4.1.4}% 46
+\BOOKMARK [3][-]{subsubsection.4.1.4.4}{Comparison of Execution Times}{subsection.4.1.4}% 47
+\BOOKMARK [0][-]{chapter.5}{Conclusion and Future Work}{}% 48
+\BOOKMARK [1][-]{section.5.1}{Conclusion}{chapter.5}% 49
+\BOOKMARK [1][-]{section.5.2}{Future Work}{chapter.5}% 50
+\BOOKMARK [0][-]{Appendix.a.A}{Appendix CNN}{}% 51
+\BOOKMARK [0][-]{Appendix.a.B}{Appendix FHEW}{}% 52

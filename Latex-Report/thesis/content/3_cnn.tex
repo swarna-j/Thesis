@@ -1,4 +1,4 @@
-\chapter{Hardware Acceleration using Graphics Processing Unit}
+\chapter{Hardware Acceleration of Convolutional Neural Networks}
 \label{ch3_cnn}
 Deep Learning is an avant-garde approach to imparting knowledge to the machines to achieve the ultimate goal of artificial intelligence without explicit coding, and bridge the current gap between technology integration and expertise. It is of interest in several domains\cite{wiki_ml}, such as:
 \begin{itemize}
@@ -334,40 +334,72 @@ In Table \ref{table:hyperparams}, the output volume of each Layer of ConvNet is 
 For example, in the first convolution layer, filtering operation requires 288K (24 $\times$ 24 $\times$ 5 $\times$ 5 $\times$ 1 $\times$ 20) MAC operations. Feature map accumulation along the depth dimension demands another 500 (20 $\times$ 1 $\times$ 5 $\times$ 5) accumulation operations. Addition of bias to each filter output involves 11520 (20 $\times$ 1 $\times$ 24 $\times$ 24) accumulation operations. Hence, the total computational demand of the first convolution layer is estimated to be around 300K MAC operations. \newline \newline
 In the MaxPool layer, the maximum value is identified in each pooling window region spanning to 2 $\times$ 2. Hence, 20 channels of 24 $\times$ 24 inputs demand a total of 20 $\times$ 12 $\times$ 12 = 2880 findMax operations in the first Maxpool layer.  The Inner Product Layer’s computational demand is dictated by the input-output dimensions. Hence, the first IP Layer involves 400K MAC operations (500 $\times$ 800) and 500 accumulations for addition of filter bias. Complexity of the ReLU and Softmax layers are dependent on the input size. \newline \newline
 The convolution layer involves about 83\% of the required arithmetic operations in the ConvNet framework. Following this, the fully connected layers are the next most resource-intensive layers. \newline \newline
-Table \ref{table:sw_hotspots} illustrates the computational complexity of all layers in the Lenet-5 ConvNet (Figure \ref{fig:Lenet-5-MNIST}) and their execution time in Intel Core i3-2350M CPU and Zedboard processing system containing 2 ARM Cortex A9 Cores.\newline \newline
-We observe from the table that for the first convolution layer, the execution time in Intel Core i3 CPU is 12.308 ms for 300,020 MAC operations. Hence, we infer that one MAC operation takes around $\frac{12.308 ms}{300020}$ = 41 ns.  Similarly, one MAC operation in Zedboard is estimated to be $\frac{66.577 ms}{300020}$ = 221.9 ns. \newline \newline
-Using these estimates, we assess the number of MAC operations per second as follows:
-\begin{enumerate}
-\item Intel Core i3-2350M:  $\frac{1}{41 ns}$ = 24,390,243.9 $\approx$ 24M MACs/second
-\item Zedboard CPU:  $\frac{1}{221.9 ns}$ = 4,506,534.475 $\approx$ 4M MACs/second
-\end{enumerate}
-In the software implementation, the input image is loaded from external memory. Hence, loading image from external memory and storing intermediate results and output in the external memory can create a lot of overhead. Typically, this data movement overhead is overcome by storing the images on-chip, avoiding unnecessary load-stores in external memory. Doing so, we can heavily accelerate the convolution and inner product layers, achieving a greater speed-up.
+Table \ref{table:sw_hotspots} illustrates the computational complexity of all layers in the Lenet-5 ConvNet (Figure \ref{fig:Lenet-5-MNIST}) and their execution time in Intel Core i3-2350M CPU and Zedboard processing system containing 2 ARM Cortex A9 Cores.\newline
+
+\begin{table}[htbp]
+\caption{Inferences from Table \ref{table:sw_hotspots} for Convolution Layer 1 running on CPU}
+\centering
+\begin{tabular}{@{}p{0.35\linewidth}*{2}{L{\dimexpr0.3\linewidth-1\tabcolsep\relax}}@{}}
+\toprule
+& \multicolumn{2}{c}{Test Devices} \\
+\cmidrule(r{4pt}){2-3} & \makecell[c]{Intel Core \\i3-2350M CPU} & \makecell[c]{ZedBoard ARM}\\
+\midrule
+Time taken for 1 MAC & \makecell[c]{$\frac{12.308 ms}{300020}$ = 41 ns} & \makecell[c]{$\frac{66.577 ms}{300020}$ = 221.9 ns} \\
+\midrule
+MACs/second &\makecell[c]{\\$\frac{1}{41 ns}$ = 24,390,243.9\\ \\$\approx$ 24M MACs/s} & \makecell[c]{\\$\frac{1}{221.9 ns}$ = 4,506,534.47\\ \\$\approx$ 4M MACs/s} \\
+\midrule
+\makecell[l]{Expected speedup with\\ hypothetical platform\\(20 processors @\\100 MHz,\\ 1MAC/cycle each)} &\makecell[c]{$\frac{12.308 ms}{150 \mu s}$ = 82.05} &\makecell[c]{$\frac{66.577 ms}{150 \mu s}$ = 443.84} \\
+\bottomrule
+\end{tabular}
+\label{table:conv1_inference}
+\end{table}
+
+We observe from the table \ref{table:sw_hotspots} that for the first convolution layer, the execution time taken by different CPUs to compute 300,020 MAC operations gives an estimate on the number of MACs/second. Using this estimates, we assess the number of MAC operations per second as shown in Table \ref{table:conv1_inference}. 
+
+In the software implementation, the input image is loaded from external memory. These load-stores in external memory can create a lot of data movement overheads. Hypothetically, these can be overcome by storing the images on-chip, avoiding unnecessary load-stores in external memory. 
 Consider a hypothetical platform with 20 RISC processors, each capable of performing 1 MAC every cycle and running at 100 MHz.
-\begin{itemize}
+\begin{enumerate}[label=(\roman*)]
 \item Time period of 1 cycle = $\frac{1}{100 MHz}$ = 10 ns
 \item Number of MACs computed by 20 RISC processors in one cycle = 20
 \item Number of cycles required to compute 300020 MACs in Convolution Layer 1 by 20 RISC processors = 15001 Cycles
 \item Time taken by 20 RISC processors to compute 300020 MACs in Convolution Layer 1 = 15001 $\times$ 10 ns =  150 us
-\end{itemize}
+\end{enumerate}
 
-\subsubsection*{Speedup:}
-\begin{enumerate}
-\item Intel Core i3-2350M: $\frac{12.308 ms}{150 \mu s}$ = 82.05
-\item Zedboard CPU: $\frac{66.577 ms}{150 \mu s}$ = 443.84
-\end{enumerate}		
-The hypothetical platform is approximately 82 times faster than the Zedboard ARM and 440 times faster than Intel platform under test.\\
-Doing a similar analysis for \textbf{convolution layer 2}: \\
-Each 12 $\times$ 12 input image involves 1689 MACs (Filtering: (8 $\times$ 8 $\times$ 5 $\times$ 5) + Feature Map Accumulation: (5 $\times$ 5) + Bias Addition: (8 $\times$ 8)). 
-\begin{itemize}
+Table \ref{table:conv2_inference} illustrates inferences for convolution layer 2 from its execution time on different CPUs. Each 12 $\times$ 12 input image involves 1689 MACs (Filtering: (8 $\times$ 8 $\times$ 5 $\times$ 5) + Feature Map Accumulation: (5 $\times$ 5) + Bias Addition: (8 $\times$ 8)). 
+
+\begin{enumerate}[label=(\roman*)]
 \item Number of cycles required to compute 1689000 MACs in Convolution Layer 2 by 20 RISC processors = 84450 Cycles
 \item Time taken by 20 RISC processors to compute 1689000 MACs in Convolution Layer 2 = 84450 $\times$ 10 ns =  844.5 us
-\end{itemize}
-With our hypothetical platform, the time taken for getting all outputs of Convolution Layer 2 is 57 times faster than Intel platform and 426 times faster than Zedboard ARM. 
+\end{enumerate}
+
+\begin{table}[htbp]
+\caption{Inferences from Table \ref{table:sw_hotspots} for Convolution Layer 2 running on CPU}
+\centering
+\begin{tabular}{@{}p{0.35\linewidth}*{2}{L{\dimexpr0.3\linewidth-1\tabcolsep\relax}}@{}}
+\toprule
+& \multicolumn{2}{c}{Test Devices} \\
+\cmidrule(r{4pt}){2-3} & \makecell[c]{Intel Core \\i3-2350M CPU} & \makecell[c]{ZedBoard ARM}\\
+\midrule
+Time taken for 1 MAC & \makecell[c]{$\frac{48.164 ms}{1689000}$ = 28.5 ns} & \makecell[c]{$\frac{359.519 ms}{1689000}$ = 212.8 ns} \\
+\midrule
+MACs/second &\makecell[c]{\\$\frac{1}{28.5 ns}$ = 35,087,719.3\\ \\$\approx$ 35M MACs/s} & \makecell[c]{\\$\frac{1}{212.8 ns}$ = 4,699,248.12\\ \\$\approx$ 4M MACs/s} \\
+\midrule
+\makecell[l]{Expected speedup with\\ hypothetical platform\\(20 processors @\\100 MHz,\\ 1MAC/cycle each)} &\makecell[c]{$\frac{48.164 ms}{844.5 \mu s}$ = 57.03} &\makecell[c]{$\frac{359.519 ms}{844.5 \mu s}$ = 425.7} \\
+\bottomrule
+\end{tabular}
+\label{table:conv2_inference}
+\end{table}
+The time taken for classification of one image is 70.029 ms in Intel Core i3 platform and 493.226 ms in Zedboard. Hence, the number of images that can be classified in one second is given by:
+\begin{enumerate}
+\item Intel Core i3-2350M: $\frac{1}{70.029 ms} \approx$ 14 frames/second
+\item Zedboard ARM Core: $\frac{1}{493.226 ms} \approx$ 2 frames/second
+\end{enumerate}
+In real-time applications, this speed is quite less and hence, we explore possibilities to improve the latency metric.
 \subsubsection{Improvements}
 \label{3_1_2_3}
 One approach to minimizing data transfer to off-chip memory is by using reduced bit-width fixed point numbers, realizable by using open-source fixed point arithmetic libraries like LibFi \cite{LibFi}. This approach is very straightforward and promises speedup, reduced area and consequently reduced energy consumption. However, the specifics of this approach are beyond the scope of this thesis. \newline \newline
-We intend to port the various layers of the ConvNet into Graphics Processing Unit for concurrent execution and significant speedup. This requires some understanding of the OpenCL device models discussed in Section \ref{2_3_1}
-Each platform comes with a ready-to-use library which may pose optimization challenges, especially when designing larger applications.  Yet another challenge is mapping, owing to differences in on-chip memory, kinds of parallelism that a particular accelerator can support and communication bandwidth. We seek to accelerate the layers of the ConvNet by using fine-grained GPUs which exhibit a high degree of data-parallelism.
+We intend to port the various layers of the ConvNet into fine-grained Graphics Processing Units which exhibit a high degree of data-parallelism. This requires some understanding of the OpenCL device models discussed in Section \ref{2_3_1}
+Each platform comes with a ready-to-use library which may pose optimization challenges, especially when designing larger applications.  Yet another challenge is mapping, owing to differences in on-chip memory, kinds of parallelism that a particular accelerator can support and communication bandwidth. 
 \subsection{Experiments with OpenCL Code}
 \label{3_1_3}
 \subsubsection{Pre-requisites}
@@ -501,16 +533,16 @@ g++ -o host_prog host_prog.o $(AOCL_LDFLAGS) -lOpenCL $(AOCL_LDLIBS)
 The OpenCL implementation of MNIST/Lenet-5 architecture available in the repository \cite{mnist-altera-opencl} is specific to Altera FPGA devices. In order to make this implementation generic and executable on CPU and GPU, the existing code flow has been examined. Figure \ref{fig:opencl_flow_lenet5} shows the sequence of steps that are done when the a sample image has to be identified.\newline \newline
 The first step is the initialization of parameters for all layers in the CNN. This is followed by allocation of buffers necessary for storing inputs and outputs of all layers on the global memory of the device, which is also accessible by the host. The function \textit{ findPlatform()} searches for relevant strings such as Intel FPGA SDK for OpenCL, Altera SDK, etc. When a match-word "Altera" is given as argument to this function, it looks for an Altera platform. Should the platform be available, the next step is to query all OpenCL devices in this platform and set one of them as the target device. \newline\newline
 The OpenCL Runtime Environment requires a \textbf{context} to manage memory, program, command issue, kernels, and program execution on the device for which the context is defined. Following the context creation, the source code to be ported to GPU is read into a program object.\newline\newline
-There are two ways to compile a kernel \cite{opencl_book_html}. \textbf{Online compilation} involves reading of the kernel source code by the host and building of the source code at runtime by the OpenCL Runtime library. For this, the API \textit{clCreateProgramWithSource()} is used, followed by the API \textit{clBuildProgram()}. This method is not recommended for embedded systems which serve real-time applications. If the kernel is pre-compiled using an OpenCL compiler, the kernel binary is already available and is directly read by the host program, skipping the runtime compilation. This is called \textbf{Offline compilation} and requires only one OpenCL function \textit{clCreateProgramWithBinary()}. Although this saves the time to compile the kernel source during runtime, it is platform-specific. If the same kernel code is to be offloaded to other platforms, then a different set of binaries should be generated. Inclusion of multiple kernel binaries increases the size of the executable.
+There are two ways to compile a kernel \cite{opencl_book_html}. \textbf{Online compilation} involves reading of the kernel source code by the host and building of the source code at runtime, by the OpenCL Runtime library. For this, the API \textit{clCreateProgramWithSource()} is used, followed by the API \textit{clBuildProgram()}. This method is not recommended for real-time embedded applications. If the kernel is pre-compiled using an OpenCL compiler, the kernel binary is already available and is directly read by the host program, skipping the runtime compilation. This is called \textbf{Offline compilation} and requires only one OpenCL function \textit{clCreateProgramWithBinary()}. Although this saves the time to compile the kernel source during runtime, it is platform-specific. If the same kernel code is to be offloaded to other platforms, then a different set of binaries should be generated. Inclusion of multiple kernel binaries increases the size of the executable.
 \begin{figure}[h!]
 \centering
 \includegraphics[width=0.7\linewidth]{figures/kernel_compilation.PNG}
 \caption{Kernel Compilation Modes \cite{opencl_book_html}}
 \label{fig:kernel_compilation}
 \end{figure}
-The reference code \cite{mnist-altera-opencl} is specific to Altera devices and hence uses offline compilation flow, due to the availability of pre-compiled binary.\newline\newline
-Next, a \textbf{command queue} is created which instructs which command has to be executed in which device of the group of devices in a particular context. It also dictates whether the execution should occur in-order or out-of-order. Because the intention is to accelerate the entire ConvNet, kernel objects are created for Convolution, Maxpooling, Inner Product and Activation Layers (ReLU and Softmax). Enough memory has to allocated on the OpenCL device to support the weights, biases and IO dimensions and execution of kernel calls for all 8 layers of the Lenet-5 Model. \newline\newline
-The input image pixels are read and normalized. The kernel code is executed on the device after the kernel arguments are supplied to all layers. The final result, i.e. the digit with maximum likelihood is read from the device, buffers and memory objects freed.
+The reference code \cite{mnist-altera-opencl} is specific to Altera devices and uses an offline compilation flow, due to the availability of pre-compiled binary.\newline\newline
+Next, a \textbf{command queue} is created which instructs which command has to be executed in which device of the group of devices in a particular context. It also dictates whether the execution should occur in-order or out-of-order. Because the intention is to accelerate the entire ConvNet, kernel objects are created for Convolution, Maxpooling, Inner Product and Activation Layers (ReLU and Softmax). Enough memory has to allocated on the OpenCL device to support the weights, biases, I/Os and execution of kernel calls for all 8 layers of the Lenet-5 Model. \newline\newline
+The input image pixels are read and normalized. The kernel code is executed on the device and the final result, i.e. the digit with maximum likelihood is read from the device. Finally, the buffers and memory objects freed.
 \subsubsection{Modifications to remove Platform Dependencies}
 \label{3_1_3_3}
 \textbf{Allocation of Buffers on the Device Memory:}\newline
@@ -523,7 +555,7 @@ For Altera FPGAs, the Altera Offline Compiler (AOC) is responsible for generatio
  \label{fig:global_mem_partitions}
 \end{figure}
 It uses the device SDRAM as global memory and by default, stores the data in a burst-interleaved fashion across various external memory banks. Although this offers uniform load distribution and better balance between the banks, manual partitioning of the data may come in handy for certain applications. For example, when the memory banks support different data-types, data cannot be impartially interleaved to these banks. \newline \newline
-The code \cite{mnist-altera-opencl} accesses global memory using optimized memory banks instead of default burst data allocation in the global memory. 
+The MNIST-Altera code \cite{mnist-altera-opencl} accesses global memory using optimized memory banks instead of default burst data allocation in the global memory. 
 For efficient global memory access, the weights and biases are stored in Bank 2 while the data is stored in Bank 1. However, the memory banks in the GPU context refer to partitioning of shared memory into equal blocks which can be accessed simultaneously. Bank conflicts due to certain access patterns can slow down the GPU performance \cite{gpu_mem_bank}. Hence, the first step to removing platform dependencies is removal of flags CL\_MEM\_BANK\_1\_ALTERA and CL\_MEM\_BANK\_2\_ALTERA which characterize Altera memory banks (Refer \ref{cnncode1:altera-dep-removal}).\newline \newline
 \definecolor{hg}{rgb}{0.75,1.0,0.75}
 \definecolor{hr}{rgb}{1.0,0.92,0.8}
@@ -581,10 +613,9 @@ using namespace std;
 \textbf{Usage of Generic OpenCL headers} \newline
 Although AOCL Utility is a platform independent C++ header file, it has been replaced with standard OpenCL headers for the sake of generality. All APIs in the scope of AOCL Utility namespace are substituted by general OpenCL APIs described in \cite{opencl_khronos}. \newline \newline
 \textbf{Kernel Loading Mechanism}\newline
-On-the-fly kernel loading, i.e. Online compilation method explained in subsection \ref{3_1_3_2} is employed. The existing and modified code changes are depicted clearly in \ref{cnncode3:altera-opencl-init}, \ref{cnncode4:gpu-opencl-init} and \ref{cnncode2:load-kernel-source}.\newline \newline
+On-the-fly kernel loading, i.e. Online compilation method explained in subsection \ref{3_1_3_2} is employed. The existing and modified code changes are depicted clearly in \ref{cnncode2:load-kernel-source}, \ref{cnncode3:altera-opencl-init} and \ref{cnncode4:gpu-opencl-init}.\newline \newline
 \textbf{Changes to Makefile}\newline
-\textit{libOpenCL.so} Shared Library is linked in the Makefile as shown in Figure \ref{fig:makefile}. Altera platform specific libraries are unlinked.\newline \newline
-The resultant code is free of any dependencies with Altera platform and hence, can be compiled and run on any OpenCL device.
+Altera platform specific libraries are unlinked. \textit{libOpenCL.so} Shared Library is linked in the Makefile as shown in Figure \ref{fig:makefile}. The resultant code is free from any dependencies with Altera platform and hence, can be compiled and run on any OpenCL device.
 \begin{figure}[h!]
 \centering
 \includegraphics[width=0.7\linewidth]{figures/makefile.png}
@@ -612,7 +643,7 @@ The kernels can be executed either in CPU or GPU devices which support OpenCL.\n
 \hfill
 \begin{minipage}{\textwidth}
 \begin{center}
-\begin{lstlisting}[caption= CPU or GPU Device Selection,frame=tlrb]{Name}
+\begin{lstlisting}[caption= CPU or GPU Device Selection,frame=tlrb, basicstyle = \small]{Name}
 int gpu = 1;
 for(unsigned i = 0;i < dev_cnt; i++){
    err = clGetDeviceIDs(platform_ids[i], gpu ? CL_DEVICE_TYPE_GPU : CL_DEVICE_TYPE_CPU, 1, &target_device, NULL);
@@ -629,7 +660,7 @@ When the integer variable \textit{'gpu'} is set to 1, the GPU device is selected
 \item Profiling should be enabled during the creation of command queue as follows:\\
 \begin{minipage}{\textwidth}
 \begin{center}
-\begin{lstlisting}[columns=fullflexible, language=C++, escapechar = \$, backgroundcolor=\color{gray!10}]
+\begin{lstlisting}[columns=fullflexible, language=C++, escapechar = \$, backgroundcolor=\color{gray!10}, basicstyle = \small]
 queue = clCreateCommandQueue(context, target_device, $\textcolor{red}{CL\_QUEUE\_PROFILING\_ENABLE}$, &status); 
 checkError(status, "Failed to create command queue");
 \end{lstlisting}
@@ -638,7 +669,7 @@ checkError(status, "Failed to create command queue");
 \item An event is associated with the kernel during its launch as follows:\\
 \begin{minipage}{\textwidth}
 \begin{center}
-\begin{lstlisting}[columns=fullflexible, language=C++, escapechar = \$, backgroundcolor=\color{gray!10}]
+\begin{lstlisting}[columns=fullflexible, language=C++, escapechar = \$, backgroundcolor=\color{gray!10}, basicstyle = \small]
 status = clEnqueueNDRangeKernel(queue, kernel[0], 3, NULL, global_work_size, NULL, 0, NULL, $\textcolor{red}{\&kernel\_event[0]}$);
 checkError(status, "Failed to launch conv1 kernel");
 \end{lstlisting}
@@ -647,7 +678,7 @@ checkError(status, "Failed to launch conv1 kernel");
 \item Kernel execution has to be completed and also all enqueued tasks in the command queue should finish.\\
 \begin{minipage}{\textwidth}
 \begin{center}
-\begin{lstlisting}[columns=fullflexible, language=C++, escapechar = \$, backgroundcolor=\color{gray!10}]
+\begin{lstlisting}[columns=fullflexible, language=C++, escapechar = \$, backgroundcolor=\color{gray!10}, basicstyle = \small]
 clWaitForEvent(1, &kernel_event[0]);
 clFinish(queue);
 \end{lstlisting}
@@ -656,7 +687,7 @@ clFinish(queue);
 \item The following APIs can be used to estimate the kernel execution time:\\
 \begin{minipage}{\textwidth}
 \begin{center}
-\begin{lstlisting}[columns=fullflexible, language=C++, escapechar = \$, backgroundcolor=\color{gray!10}]
+\begin{lstlisting}[columns=fullflexible, language=C++, escapechar = \$, backgroundcolor=\color{gray!10}, basicstyle = \small]
 cl_ulong start_time, end_time;
 double total_time;
 clGetEventProfilingInfo(kernel_event[0], CL_PROFILING_COMMAND_START, sizeof(start_time), &start_time, NULL);
@@ -747,11 +778,36 @@ The ratio $R_{acceleration}$ = $\frac{t_{sw}}{t_{hw}} \textgreater $ 1\newline
 \node[align=center,font=\bfseries](title) at (current bounding box.north)
 {Hardware Speedup (Reference: Table \ref{table:results_compare_cnn})};
 \end{tikzpicture}
-The total time required to classify one input image is 1.21ms in Intel Core i3-2350M, 14.526ms in NVIDIA GeForce 315M, 3.905ms in NVIDIA Quadro 600 and 322 us in Intel Xeon platform. This implies that in one second, the number of images that can be processed by each of these heterogeneous platforms is given by:
+\newline The total time required to classify one input image is 1.21ms in Intel Core i3-2350M, 14.526ms in NVIDIA GeForce 315M, 3.905ms in NVIDIA Quadro 600 and 322 us in Intel Xeon platform. This implies that in one second, the number of images that can be processed by each of these heterogeneous platforms is given by:
 \begin{enumerate}
 \item Intel Core i3-2350M:  $\frac{1}{1.21ms} \approx$ 826 frames/second
 \item NVIDIA GeForce 315M:  $\frac{1}{14.526ms} \approx$ 68 frames/second
 \item Intel Xeon CPU E5-1650: $\frac{1}{0.322ms} \approx$ 3105 frames/second
 \item NVIDIA Quadro 600: $\frac{1}{3.905ms} \approx$ 256 frames/second
 \end{enumerate}
-We observe that with more memory to work on and more compute units, more threads can be concurrently executed and hence, more speedup can be achieved. 
+
+\begin{table}[htbp]
+\caption{Inferences from execution times of OpenCL devices running offloaded Convolution Layer 1 code (Calculations similar to Tables \ref{table:conv1_inference} and \ref{table:conv2_inference})}
+\centering
+\begin{tabular}{@{}p{0.4\linewidth}*{4}{L{\dimexpr0.15\linewidth-1\tabcolsep\relax}}@{}}
+\toprule
+& \multicolumn{4}{c}{Test Devices} \\
+\cmidrule(r{4pt}){2-5} & \makecell[c]{Intel\\Core\\i3-2350M} & \makecell[c]{NVIDIA\\GeForce\\315M} & \makecell[c]{Intel\\Xeon\\CPU\\E5-1650}&\makecell[c]{NVIDIA\\Quadro\\600}\\
+\midrule
+Time taken for 1 MAC & \makecell[c]{0.7 ns} & \makecell[c]{2.35 ns} &\makecell[c]{0.29 ns} & \makecell[c]{0.47 ns}\\
+\midrule
+MACs/second (approx.) &\makecell[c]{1 B} & \makecell[c]{400 M} &\makecell[c]{3 B} &\makecell[c]{2 B}\\
+\midrule
+\makecell[l]{Gained Speedup compared\\to Intel Core i-3 running\\ single-threaded C++ code} &\makecell[c]{56.98} &\makecell[c]{17.4}&\makecell[c]{139.86} &\makecell[c]{86.069} \\
+\midrule
+\makecell[l]{Gained Speedup compared\\to Zedboard ARM running\\single-threaded C++ code} &\makecell[c]{308.2} &\makecell[c]{94}&\makecell[c]{756.5} &\makecell[c]{465.57} \\
+\midrule
+\makecell[l]{Expected speedup with\\ hypothetical platform\\(20 processors @ 100 MHz,\\1 MAC/cycle each)} &\makecell[c]{1.44} &\makecell[c]{4.7}&\makecell[c]{0.58} &\makecell[c]{0.95} \\
+\bottomrule
+\end{tabular}
+\label{table:opencl_conv1_inference}
+\end{table}
+
+In summary, it can be observed from Table \ref{table:conv1_inference} that when running single-threaded C++ code for convolution layer 1, the hypothetical platform is approximately 82 times faster than Intel core-i3 and 440 times faster than Zedboard ARM. Table \ref{table:conv2_inference} estimates reveal that the time required for the hypothetical platform to get all outputs of Convolution Layer 2 is 57 times faster than Intel core-i3 platform and 426 times faster than Zedboard ARM for convolution layer 2. \newline \newline
+A close observation of Tables \ref{table:dev_query} and \ref{table:results_compare_cnn} shows that with more memory to work on and more compute units, more threads can be concurrently executed and hence, more speedup can be achieved. \newline \newline
+When the same CNN code is offloaded to an OpenCL device capable of executing multiple threads in parallel, the gain in latency is enormous, almost comparable to our hypothetical platform. For example, the same convolution algorithm running on the same platform, Intel Core i-3 CPU offers different latencies depending on whether it is a sequential execution or multi-threaded concurrent execution on several compute units. The OpenCL code is approximately 57 times faster than its single-threaded C++ counterpart (Reference: Table \ref{table:opencl_conv1_inference}). Executing work items on several low-power compute units not only improves latency but also allows CPU to perform other critical tasks. These heterogeneous architectures allow complex applications to be made more practical and hence drive today's technology roadmap.
